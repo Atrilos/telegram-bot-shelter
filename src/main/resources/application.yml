@@ -1,0 +1,33 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+spring:
+  datasource:
+    url:
+    username:
+    password:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    show-sql: true
+    open-in-view: false
+  jackson:
+    serialization:
+      indent-output: true
+  liquibase:
+    change-log: classpath:db/changelog-master.yml
+logging:
+  level:
+    org:
+      hibernate: INFO
+# Constants
+telegram:
+  bot:
+    token:
+
