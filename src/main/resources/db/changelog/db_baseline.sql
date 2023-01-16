@@ -18,6 +18,8 @@ CREATE TABLE users
     chat_id      BIGINT                                  NOT NULL,
     is_admin     BOOLEAN DEFAULT FALSE,
     is_volunteer BOOLEAN DEFAULT FALSE,
+    email        VARCHAR(255),
+    phone_number VARCHAR(20),
     CONSTRAINT users_pkey PRIMARY KEY (id)
 );
 -- rollback drop table users;
@@ -26,21 +28,4 @@ CREATE TABLE users
 ALTER TABLE users
     ADD CONSTRAINT uq_chat_id UNIQUE (chat_id);
 -- rollback alter table users drop constraint uq_chat_id;
-
--- changeset atrilos:4
-CREATE TABLE user_details
-(
-    "email"        VARCHAR(255),
-    "phone_number" VARCHAR(20),
-    "user_id"      BIGINT NOT NULL,
-    CONSTRAINT user_details_pkey PRIMARY KEY (user_id)
-);
--- rollback drop table user_details;
-
--- changeset atrilos:5
-ALTER TABLE user_details
-    ADD CONSTRAINT user_details_on_user_fk FOREIGN KEY (user_id) REFERENCES users (id)
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE;
--- rollback alter table user_details drop constraint user_details_on_user_fk;
 

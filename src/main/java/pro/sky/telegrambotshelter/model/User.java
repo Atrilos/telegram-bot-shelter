@@ -30,14 +30,19 @@ public class User {
     @Column(name = "is_volunteer")
     private Boolean isVolunteer = Boolean.FALSE;
 
-    @OneToOne(mappedBy = "user")
-    private UserDetails userDetails;
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber;
+
+    @Column(name = "email")
+    private String email;
 
     @PostPersist
     public void logUserAdded() {
         log.info(
-                "Added user: chatId={}",
-                chatId
+                "Added user: chatId={}, phoneNumber={}, email={}",
+                chatId,
+                phoneNumber,
+                email
         );
     }
 
