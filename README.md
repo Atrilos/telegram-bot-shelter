@@ -10,7 +10,7 @@ http://t.me/Java9Team3_AnimalShelterBot
 - 
 # Участники
 - [Константин Пырх](https://github.com/qqqbbb)
-- Елена Белоус
+- [Елена Белоус](https://github.com/BelousEV)
 - [Клементьев Василий](https://github.com/Atrilos)
 
 
