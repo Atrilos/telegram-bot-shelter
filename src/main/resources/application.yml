@@ -4,9 +4,9 @@ server:
     include-message: always
 spring:
   datasource:
-    url:
-    username:
-    password:
+    url: jdbc:postgresql://localhost:5432/tgbot_shelter
+    username: tgbot_user
+    password: jB9g_wEp$=
     driver-class-name: org.postgresql.Driver
   jpa:
     properties:
@@ -14,7 +14,7 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: validate
-    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     open-in-view: false
   jackson:
@@ -29,5 +29,5 @@ logging:
 # Constants
 telegram:
   bot:
-    token:
+    token: 5529000023:AAHCFANqn0xfe6Pxiqkmk6o6PGfDNVW_i_A
 
