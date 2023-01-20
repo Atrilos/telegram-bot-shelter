@@ -1,6 +1,5 @@
 package pro.sky.telegrambotshelter.model.enums;
 
-import com.pengrad.telegrambot.model.BotCommand;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import pro.sky.telegrambotshelter.model.commands.*;
@@ -9,41 +8,25 @@ import pro.sky.telegrambotshelter.model.commands.*;
 @Getter
 public enum AvailableCommands {
     START("/start",
-            new BotCommand("/start", "Приветствие пользователя"),
-            new StartCommandHandler()
+            new StartCommand("/start", "Приветствие пользователя")
     ),
     HELP("/help",
-            new BotCommand("/help", "Детальное описание команд"),
-            new HelpCommandHandler()
+            new HelpCommand("/help", "Детальное описание команд")
     ),
     ADOPT("/adopt",
-            new BotCommand("/adopt", "Взять собаку из приюта"),
-            new AdoptCommandHandler()
+            new AdoptCommand("/adopt", "Взять собаку из приюта")
     ),
     SHELTER_INFO("/shelter_info",
-            new BotCommand("/shelter_info", "Узнать информацию о приюте"),
-            new ShelterInfoCommandHandler()
+            new ShelterInfoCommand("/shelter_info", "Узнать информацию о приюте")
     ),
     REPORT("/report",
-            new BotCommand("/report", "Прислать отчет о питомце"),
-            new ReportCommandHandler()
+            new ReportCommand("/report", "Прислать отчет о питомце")
     ),
     CALL_STAFF("/call_staff",
-            new BotCommand("/call_staff", "Позвать волонтера"),
-            new CallStaffCommandHandler()
+            new CallStaffCommand("/call_staff", "Позвать волонтера")
     );
     private final String value;
-    private final BotCommand command;
-    private final CommandHandler commandHandler;
-
-    public static AvailableCommands fromString(String command) {
-
-        for (AvailableCommands c : AvailableCommands.values())
-            if (c.value.equals(command))
-                return c;
-
-        return null;
-    }
+    private final ExecutableBotCommand command;
 
     @Override
     public String toString() {

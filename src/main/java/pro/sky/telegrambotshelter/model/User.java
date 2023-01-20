@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
+import pro.sky.telegrambotshelter.model.enums.UserState;
 
 import java.util.Objects;
 
@@ -12,6 +13,7 @@ import java.util.Objects;
 @Builder
 @Getter
 @Setter
+@ToString
 @Entity
 @Slf4j
 @Table(name = "users")
@@ -24,6 +26,9 @@ public class User {
     @Column(name = "chat_id", nullable = false, unique = true)
     private Long chatId;
 
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
     @Column(name = "is_admin")
     private Boolean isAdmin = Boolean.FALSE;
 
@@ -33,16 +38,17 @@ public class User {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "state")
+    @Enumerated(EnumType.STRING)
+    private UserState state;
 
     @PostPersist
     public void logUserAdded() {
         log.info(
-                "Added user: chatId={}, phoneNumber={}, email={}",
+                "Added user: chatId={}, phoneNumber={}, first_name={}",
                 chatId,
                 phoneNumber,
-                email
+                firstName
         );
     }
 
