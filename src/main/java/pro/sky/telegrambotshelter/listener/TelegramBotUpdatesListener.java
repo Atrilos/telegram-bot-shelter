@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import pro.sky.telegrambotshelter.model.enums.BotMenus;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.service.MainService;
 
@@ -23,6 +24,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     @PostConstruct
     public void init() {
         telegramBot.setUpdatesListener(this);
+        BotMenus.currentMenu = BotMenus.MAIN;
     }
 
     @Override

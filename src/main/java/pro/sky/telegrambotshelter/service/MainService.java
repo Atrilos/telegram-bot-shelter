@@ -19,6 +19,7 @@ public class MainService {
     private final UserService userService;
 
     private void processTextMessage(Update update, User user) {
+        System.out.println("MainService processTextMessage");
         Long chatId = update.message().chat().id();
         ExecutableBotCommand receivedCommand = bot.getCommand(update.message().text());
         if (user.getState() == UserState.BASIC_STATE && receivedCommand == null) {
