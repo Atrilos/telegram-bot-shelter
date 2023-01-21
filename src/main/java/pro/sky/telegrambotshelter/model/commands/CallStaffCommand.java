@@ -6,10 +6,10 @@ import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendContact;
 import com.pengrad.telegrambot.request.SendMessage;
-import org.jetbrains.annotations.NotNull;
 import pro.sky.telegrambotshelter.model.User;
-import pro.sky.telegrambotshelter.model.enums.UserState;
+import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.UserService;
+import pro.sky.telegrambotshelter.utils.KeyboardUtils;
 
 public class CallStaffCommand extends ExecutableBotCommand {
 
@@ -18,34 +18,31 @@ public class CallStaffCommand extends ExecutableBotCommand {
         super(command, description);
     }
 
-    @NotNull
-    private static ReplyKeyboardMarkup createKeyboard() {
-        KeyboardButton[] acceptButton = new KeyboardButton[]{
-                new KeyboardButton("Передать ваш контакт волонтеру").requestContact(true)
-        };
-        KeyboardButton[] cancelButton = new KeyboardButton[]{new KeyboardButton("Назад")};
-        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(acceptButton, cancelButton);
-        replyKeyboardMarkup.oneTimeKeyboard(true);
-        replyKeyboardMarkup.resizeKeyboard(true);
-        return replyKeyboardMarkup;
+    private ReplyKeyboardMarkup createReplyKeyboard() {
+
+        KeyboardButton[] acceptButton =
+                KeyboardUtils.createKeyboardButton("Передать ваш контакт волонтеру", true);
+        KeyboardButton[] cancelButton =
+                KeyboardUtils.createKeyboardButton("/to_main_menu", false);
+
+        return KeyboardUtils.createKeyboard(acceptButton, cancelButton);
     }
 
     @Override
-    public void execute(TelegramBot bot, Update update, UserService userService) {
+    public void execute(TelegramBot bot, Update update, User user, UserService userService) {
         Long chatId = update.message().chat().id();
-        User user = userService.getUser(chatId);
 
         if (user.getPhoneNumber() == null) {
             SendMessage message = new SendMessage(chatId, "Разрешаете ли вы передать ваш контакт волонтеру?");
-            ReplyKeyboardMarkup replyKeyboardMarkup = createKeyboard();
+            ReplyKeyboardMarkup replyKeyboardMarkup = createReplyKeyboard();
             message.replyMarkup(replyKeyboardMarkup);
             bot.execute(message);
-            userService.changeUserState(user, UserState.CALL_STAFF_STATE);
         } else {
             Long availableVolunteerId = findAvailableVolunteer(userService);
             sendMessageToVolunteer(bot, availableVolunteerId, user);
-            userService.changeUserState(user, UserState.BASIC_STATE);
         }
+
+        userService.changeCurrentMenu(user, CurrentMenu.MAIN);
     }
 
     private Long findAvailableVolunteer(UserService userService) {

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
-import pro.sky.telegrambotshelter.model.enums.UserState;
+import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 
 import java.util.Objects;
 
@@ -38,9 +38,9 @@ public class User {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
-    @Column(name = "state")
+    @Column(name = "current_menu")
     @Enumerated(EnumType.STRING)
-    private UserState state;
+    private CurrentMenu currentMenu;
 
     @PostPersist
     public void logUserAdded() {

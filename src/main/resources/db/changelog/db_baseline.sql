@@ -49,3 +49,13 @@ alter table users
     alter column state set default 'BASIC_STATE';
 -- rollback alter table users alter column state drop default;
 
+-- changeset atrilos:8
+alter table users
+    rename column state to current_menu;
+-- rollback alter table users rename column current_menu to state;
+
+-- changeset atrilos:9
+alter table users
+    alter column current_menu set default 'MAIN';
+-- rollback alter table users alter column current_menu set default 'BASIC_STATE';
+

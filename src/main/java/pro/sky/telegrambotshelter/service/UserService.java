@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pro.sky.telegrambotshelter.exception.PrimaryKeyNotNullException;
 import pro.sky.telegrambotshelter.exception.UserNotFoundException;
 import pro.sky.telegrambotshelter.model.User;
-import pro.sky.telegrambotshelter.model.enums.UserState;
+import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.repository.UserRepository;
 
 import java.util.LinkedList;
@@ -63,21 +63,21 @@ public class UserService {
         }
     }
 
-    public void registerContact(Contact contact) {
+    public User registerContact(Contact contact) {
         User user = userRepository
                 .findByChatId(contact.userId())
                 .orElseThrow(() -> new UserNotFoundException(
                         "User with id=%d not found".formatted(contact.userId()))
                 );
         user.setPhoneNumber(contact.phoneNumber());
-        updateEntity(user);
+        return updateEntity(user);
     }
 
     private void registerNewUser(String firstName, Long chatId) {
         User user = User.builder()
                 .firstName(firstName)
                 .chatId(chatId)
-                .state(UserState.BASIC_STATE)
+                .currentMenu(CurrentMenu.MAIN)
                 .build();
         saveEntity(user);
     }
@@ -89,8 +89,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private void updateEntity(User user) {
-        userRepository.save(user);
+    private User updateEntity(User user) {
+        return userRepository.saveAndFlush(user);
     }
 
     private boolean isRegistered(Long chatId) {
@@ -107,8 +107,8 @@ public class UserService {
                 );
     }
 
-    public void changeUserState(User user, UserState newState) {
-        user.setState(newState);
+    public void changeCurrentMenu(User user, CurrentMenu newMenu) {
+        user.setCurrentMenu(newMenu);
         updateEntity(user);
     }
 }

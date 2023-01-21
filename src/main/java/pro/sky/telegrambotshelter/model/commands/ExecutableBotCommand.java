@@ -3,6 +3,7 @@ package pro.sky.telegrambotshelter.model.commands;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.BotCommand;
 import com.pengrad.telegrambot.model.Update;
+import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.service.UserService;
 
 
@@ -23,5 +24,5 @@ public abstract class ExecutableBotCommand extends BotCommand {
         }
     }
 
-    public abstract void execute(TelegramBot bot, Update update, UserService userService);
+    public abstract void execute(TelegramBot bot, Update update, User user, UserService userService);
 }
