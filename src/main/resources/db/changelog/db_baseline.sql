@@ -29,3 +29,33 @@ ALTER TABLE users
     ADD CONSTRAINT uq_chat_id UNIQUE (chat_id);
 -- rollback alter table users drop constraint uq_chat_id;
 
+-- changeset atrilos:4
+ALTER TABLE users
+    DROP COLUMN email;
+-- rollback alter table users add column email varchar(255);
+
+-- changeset atrilos:5
+ALTER TABLE users
+    ADD COLUMN first_name VARCHAR(255);
+-- rollback alter table users drop column first_name;
+
+-- changeset atrilos:6
+ALTER TABLE users
+    ADD COLUMN state VARCHAR(255);
+-- rollback alter table users drop column state;
+
+-- changeset atrilos:7
+alter table users
+    alter column state set default 'BASIC_STATE';
+-- rollback alter table users alter column state drop default;
+
+-- changeset atrilos:8
+alter table users
+    rename column state to current_menu;
+-- rollback alter table users rename column current_menu to state;
+
+-- changeset atrilos:9
+alter table users
+    alter column current_menu set default 'MAIN';
+-- rollback alter table users alter column current_menu set default 'BASIC_STATE';
+

@@ -7,7 +7,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import pro.sky.telegrambotshelter.model.enums.BotMenus;
+import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.service.MainService;
 
 import java.util.List;
@@ -23,15 +23,20 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     @PostConstruct
     public void init() {
         telegramBot.setUpdatesListener(this);
-        BotMenus.currentMenu = BotMenus.MAIN;
     }
 
     @Override
     public int process(List<Update> updates) {
         updates.forEach(update -> {
-            log.info("Processing update: {}", update);
-            if (update.message() != null)
-                mainService.processTextMessage(update);
+            try {
+                log.info("Processing update: {}", update);
+                if (update.message() != null) {
+                    User user = mainService.authenticateUser(update);
+                    mainService.processMessageByType(update, user);
+                }
+            } catch (Exception e) {
+                log.error(e.toString());
+            }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
