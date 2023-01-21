@@ -4,10 +4,10 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
 import pro.sky.telegrambotshelter.model.enums.BotMenus;
 
-public class ReportCommandHandler implements CommandHandler {
+public class ToMainMenuCommandHandler implements CommandHandler {
     @Override
     public void process(TelegramBot bot, Update update) {
-        BotMenus.currentMenu = BotMenus.REPORT;
+        BotMenus.currentMenu = BotMenus.MAIN;
 
     }
 }
