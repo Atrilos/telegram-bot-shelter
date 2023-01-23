@@ -8,6 +8,7 @@ import pro.sky.telegrambotshelter.service.UserService;
 
 import static pro.sky.telegrambotshelter.configuration.messages.CommandResponseMessages.START_RESPONSE_MSG;
 
+
 public class StartCommand extends ExecutableBotCommand {
 
     public StartCommand(String command, String description) {

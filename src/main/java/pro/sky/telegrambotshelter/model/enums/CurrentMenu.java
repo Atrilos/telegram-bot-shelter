@@ -7,6 +7,9 @@ import java.util.List;
 
 import static pro.sky.telegrambotshelter.model.enums.AvailableCommands.*;
 
+/**
+ * Enum класс для обозначения текущего меню пользователя
+ */
 @Getter
 @RequiredArgsConstructor
 public enum CurrentMenu {
@@ -15,6 +18,9 @@ public enum CurrentMenu {
     ADOPTION(List.of(MEET_DOG, PAPERS, TRANSPORT_ANIMAL, PUPPY_HOME, DOG_HOME, DISABLED_DOG_HOME, COMMUNICATION, DOG_HANDLERS, REFUSAL_CAUSE, STORE_CONTACT_INFO, TO_MAIN_MENU, CALL_STAFF)),
     REPORT(List.of(TO_MAIN_MENU, CALL_STAFF));
 
+    /**
+     * Список доступных команд в текущем подменю
+     */
     private final List<AvailableCommands> availableCommands;
 
 }

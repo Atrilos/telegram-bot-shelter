@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import pro.sky.telegrambotshelter.model.commands.*;
 
+/**
+ * Enum класс, содержащий доступные боту команды
+ */
 @RequiredArgsConstructor
 @Getter
 public enum AvailableCommands {
@@ -82,9 +85,18 @@ public enum AvailableCommands {
     TO_MAIN_MENU("/to_main_menu",
             new ToMainMenuCommand("/to_main_menu", "В главное меню"), true
     );
+    /**
+     * Текстовое значение команды
+     */
     private final String value;
+    /**
+     * Команда в виде {@link pro.sky.telegrambotshelter.model.commands.ExecutableBotCommand ExecutableBotCommand}
+     */
     private final ExecutableBotCommand command;
-    private final Boolean isNested;
+    /**
+     * Является ли командой верхнего уровня или частью подменю
+     */
+    private final boolean nested;
 
     @Override
     public String toString() {

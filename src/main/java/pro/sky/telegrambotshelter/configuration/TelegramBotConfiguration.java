@@ -6,9 +6,15 @@ import org.springframework.context.annotation.Configuration;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 
+/**
+ * Конфигурация телеграм-бота
+ */
 @Configuration
 public class TelegramBotConfiguration {
 
+    /**
+     * Значение токена бота
+     */
     @Value("${telegram.bot.token}")
     private String token;
 

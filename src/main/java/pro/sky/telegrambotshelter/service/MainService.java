@@ -12,6 +12,9 @@ import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 
 import static pro.sky.telegrambotshelter.configuration.messages.CommandResponseMessages.UNSUPPORTED_RESPONSE_MSG;
 
+/**
+ * Основной сервис для обработки поступающих сообщений
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -19,11 +22,22 @@ public class MainService {
     private final TelegramCommandBot bot;
     private final UserService userService;
 
+    /**
+     * Метод, производящий аутентификацию пользователя, используя данных из обновления.
+     * Получает данные о пользователе из БД, при необходимости создает нового пользователя
+     * @param update полученное обновление
+     * @return данные о пользователе из БД
+     */
     public User authenticateUser(Update update) {
         userService.registerIfAbsent(update);
         return userService.getUser(update.message().chat().id());
     }
 
+    /**
+     * Разделение полученных сообщений по типу
+     * @param update полученное обновление
+     * @param user данные о пользователе из БД
+     */
     public void processMessageByType(Update update, User user) {
         if (update.message().contact() != null) {
             processContact(update);
@@ -32,6 +46,11 @@ public class MainService {
         }
     }
 
+    /**
+     * Обработка текстовых сообщений
+     * @param update полученное обновление
+     * @param user данные о пользователе из БД
+     */
     private void processTextMessage(Update update, User user) {
         log.info("MainService processTextMessage");
         Long chatId = update.message().chat().id();
@@ -43,6 +62,10 @@ public class MainService {
         }
     }
 
+    /**
+     * Обработка полученного {@link com.pengrad.telegrambot.model.Contact контакта}
+     * @param update полученное обновление
+     */
     private void processContact(Update update) {
         User updatedUser = userService.registerContact(update.message().contact());
         bot.getCommand(AvailableCommands.CALL_STAFF.getValue())

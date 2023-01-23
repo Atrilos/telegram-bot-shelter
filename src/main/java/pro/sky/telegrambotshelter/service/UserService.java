@@ -18,11 +18,17 @@ import pro.sky.telegrambotshelter.repository.UserRepository;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Сервис для обработки взаимодействий с пользователями
+ */
 @Service
 @EnableAsync
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    /**
+     * Список волонтеров
+     */
     private final LinkedList<User> volunteerList = new LinkedList<>();
 
     @PostConstruct
@@ -30,6 +36,10 @@ public class UserService {
         updateVolunteerList();
     }
 
+    /**
+     * Метод, возвращающий следующего по порядку волонтера из списка волонтеров
+     * @return chatId следующего волонтера
+     */
     public Long getNextVolunteer() {
         User first = volunteerList.pollFirst();
 
@@ -41,6 +51,9 @@ public class UserService {
         return first.getChatId();
     }
 
+    /**
+     * Event loop обновляющий список волонтеров
+     */
     @Scheduled(cron = "0 */1 * * * *")
     @Async
     @Transactional
@@ -53,6 +66,10 @@ public class UserService {
     }
 
 
+    /**
+     * Метод, регистрирующий пользователя, если запись о нем отсутствует в БД
+     * @param update полученное обновление
+     */
     public void registerIfAbsent(Update update) {
         Long chatId = update.message().chat().id();
         if (!isRegistered(chatId)) {
@@ -63,6 +80,11 @@ public class UserService {
         }
     }
 
+    /**
+     * Метод, добавляющий телефонный номер пользователя при получении контактной информации
+     * @param contact {@link com.pengrad.telegrambot.model.Contact контактная информация}
+     * @return обновленная сущность из БД
+     */
     public User registerContact(Contact contact) {
         User user = userRepository
                 .findByChatId(contact.userId())
@@ -73,15 +95,26 @@ public class UserService {
         return updateEntity(user);
     }
 
+    /**
+     * Регистрация нового пользователя
+     * @param firstName имя пользователя
+     * @param chatId уникальный идентификатор чата
+     */
     private void registerNewUser(String firstName, Long chatId) {
         User user = User.builder()
                 .firstName(firstName)
                 .chatId(chatId)
+                .isAdmin(false)
+                .isVolunteer(false)
                 .currentMenu(CurrentMenu.MAIN)
                 .build();
         saveEntity(user);
     }
 
+    /**
+     * Метод, сохраняющий пользователя в БД при условии основного ключа равного null
+     * @param user сохраняемый в БД пользователь
+     */
     private void saveEntity(User user) {
         if (user.getId() != null) {
             throw new PrimaryKeyNotNullException("%s primary key not null when saving new entity".formatted(user));
@@ -89,16 +122,32 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Метод, обновляющий данные пользователя в БД
+     * @param user пользователь, с обновленными данными
+     * @return обновленная сущность
+     */
     private User updateEntity(User user) {
         return userRepository.saveAndFlush(user);
     }
 
+    /**
+     * Метод, проверяющий наличие пользователя в БД по его chatId
+     * @param chatId уникальный идентификатор чата
+     * @return true - пользователь в базе, false - в ином случае
+     */
     private boolean isRegistered(Long chatId) {
         return userRepository
                 .findByChatId(chatId)
                 .isPresent();
     }
 
+    /**
+     * Получение пользователя по его chatId
+     * @param chatId уникальный идентификатор чата
+     * @throws UserNotFoundException пользователь не найден в БД
+     * @return полученная сущность из БД
+     */
     public User getUser(Long chatId) {
         return userRepository
                 .findByChatId(chatId)
@@ -107,6 +156,11 @@ public class UserService {
                 );
     }
 
+    /**
+     * Изменение текущего меню для пользователя и сохранение этих данных в БД
+     * @param user текущий пользователь
+     * @param newMenu новое значение текущего меню
+     */
     public void changeCurrentMenu(User user, CurrentMenu newMenu) {
         user.setCurrentMenu(newMenu);
         updateEntity(user);

@@ -7,6 +7,9 @@ import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Класс, содержащий константы для текстовых ответов на запросы боту.
+ */
 public class CommandResponseMessages {
     public static final String START_RESPONSE_MSG = """
             ПРИВЕТСТВУЕМ, %s!
@@ -14,6 +17,10 @@ public class CommandResponseMessages {
     public static final String HELP_RESPONSE_MSG = createListOfAvailableCommands();
     public static final String UNSUPPORTED_RESPONSE_MSG = "Команда не поддерживается";
 
+    /**
+     * Вспомогательный метод для формирования справки
+     * @return текст для справки /help
+     */
     public static String createListOfAvailableCommands() {
         List<ExecutableBotCommand> list = Arrays.stream(AvailableCommands.values()).map(AvailableCommands::getCommand).toList();
         StringBuilder sb = new StringBuilder("Список доступных команд:\n");
