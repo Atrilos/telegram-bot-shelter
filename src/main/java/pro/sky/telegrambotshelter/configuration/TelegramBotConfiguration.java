@@ -20,6 +20,10 @@ public class TelegramBotConfiguration {
     @Value("${telegram.bot.token}")
     private String token;
 
+    /**
+     * Создание бина телеграм бота
+     * @return созданный {@link TelegramCommandBot}
+     */
     @Bean
     public TelegramCommandBot telegramCommandBot() {
         TelegramCommandBot bot = new TelegramCommandBot(token);
@@ -31,9 +35,6 @@ public class TelegramBotConfiguration {
         topLevelCommands
                 .forEach(bot::registerCommand);
         bot.createMainMenu();
-        Arrays
-                .stream(AvailableCommands.values())
-                .forEach(bot::registerCommand);
         return bot;
     }
 

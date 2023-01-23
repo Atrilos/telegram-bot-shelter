@@ -3,6 +3,7 @@ package pro.sky.telegrambotshelter.model.commands;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Component;
+import pro.sky.telegrambotshelter.configuration.messages.CommandResponseMessages;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
@@ -30,20 +31,6 @@ public class HelpCommand extends ExecutableBotCommand {
     @Override
     public void execute(Update update, User user) {
         Long chatId = update.message().chat().id();
-        bot.execute(new SendMessage(chatId, createListOfAvailableCommands()));
-    }
-
-    /**
-     * Вспомогательный метод для формирования справки
-     *
-     * @return текст для справки /help
-     */
-    public String createListOfAvailableCommands() {
-        StringBuilder sb = new StringBuilder("Список доступных команд:\n");
-        bot.getCommandRegistry().forEach(botCommand -> sb.append(botCommand.command())
-                .append(" - ")
-                .append(botCommand.description())
-                .append("\n"));
-        return sb.toString();
+        bot.execute(new SendMessage(chatId, CommandResponseMessages.HELP_RESPONSE_MSG));
     }
 }
