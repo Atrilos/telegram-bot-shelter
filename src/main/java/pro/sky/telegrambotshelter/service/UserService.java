@@ -38,6 +38,7 @@ public class UserService {
 
     /**
      * Метод, возвращающий следующего по порядку волонтера из списка волонтеров
+     *
      * @return chatId следующего волонтера
      */
     public Long getNextVolunteer() {
@@ -68,6 +69,7 @@ public class UserService {
 
     /**
      * Метод, регистрирующий пользователя, если запись о нем отсутствует в БД
+     *
      * @param update полученное обновление
      */
     public void registerIfAbsent(Update update) {
@@ -82,6 +84,7 @@ public class UserService {
 
     /**
      * Метод, добавляющий телефонный номер пользователя при получении контактной информации
+     *
      * @param contact {@link com.pengrad.telegrambot.model.Contact контактная информация}
      * @return обновленная сущность из БД
      */
@@ -97,8 +100,9 @@ public class UserService {
 
     /**
      * Регистрация нового пользователя
+     *
      * @param firstName имя пользователя
-     * @param chatId уникальный идентификатор чата
+     * @param chatId    уникальный идентификатор чата
      */
     private void registerNewUser(String firstName, Long chatId) {
         User user = User.builder()
@@ -113,6 +117,7 @@ public class UserService {
 
     /**
      * Метод, сохраняющий пользователя в БД при условии основного ключа равного null
+     *
      * @param user сохраняемый в БД пользователь
      */
     private void saveEntity(User user) {
@@ -124,6 +129,7 @@ public class UserService {
 
     /**
      * Метод, обновляющий данные пользователя в БД
+     *
      * @param user пользователь, с обновленными данными
      * @return обновленная сущность
      */
@@ -133,6 +139,7 @@ public class UserService {
 
     /**
      * Метод, проверяющий наличие пользователя в БД по его chatId
+     *
      * @param chatId уникальный идентификатор чата
      * @return true - пользователь в базе, false - в ином случае
      */
@@ -144,9 +151,10 @@ public class UserService {
 
     /**
      * Получение пользователя по его chatId
+     *
      * @param chatId уникальный идентификатор чата
-     * @throws UserNotFoundException пользователь не найден в БД
      * @return полученная сущность из БД
+     * @throws UserNotFoundException пользователь не найден в БД
      */
     public User getUser(Long chatId) {
         return userRepository
@@ -158,7 +166,8 @@ public class UserService {
 
     /**
      * Изменение текущего меню для пользователя и сохранение этих данных в БД
-     * @param user текущий пользователь
+     *
+     * @param user    текущий пользователь
      * @param newMenu новое значение текущего меню
      */
     public void changeCurrentMenu(User user, CurrentMenu newMenu) {

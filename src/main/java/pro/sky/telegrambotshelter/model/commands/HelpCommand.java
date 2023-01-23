@@ -1,20 +1,49 @@
 package pro.sky.telegrambotshelter.model.commands;
 
-import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import pro.sky.telegrambotshelter.configuration.messages.CommandResponseMessages;
+import org.springframework.stereotype.Component;
 import pro.sky.telegrambotshelter.model.User;
+import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
+import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
+import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.UserService;
 
+import java.util.EnumSet;
+
+@Component
 public class HelpCommand extends ExecutableBotCommand {
-    public HelpCommand(String command, String description) {
-        super(command, description);
+
+    private final UserService userService;
+    private final TelegramCommandBot bot;
+
+    public HelpCommand(UserService userService, TelegramCommandBot bot) {
+        super(AvailableCommands.HELP.getCommand(),
+                AvailableCommands.HELP.getDescription(),
+                AvailableCommands.HELP.isTopLevel(),
+                EnumSet.allOf(CurrentMenu.class)
+        );
+        this.userService = userService;
+        this.bot = bot;
     }
 
     @Override
-    public void execute(TelegramBot bot, Update update, User user, UserService userService) {
+    public void execute(Update update, User user) {
         Long chatId = update.message().chat().id();
-        bot.execute(new SendMessage(chatId, CommandResponseMessages.HELP_RESPONSE_MSG));
+        bot.execute(new SendMessage(chatId, createListOfAvailableCommands()));
+    }
+
+    /**
+     * Вспомогательный метод для формирования справки
+     *
+     * @return текст для справки /help
+     */
+    public String createListOfAvailableCommands() {
+        StringBuilder sb = new StringBuilder("Список доступных команд:\n");
+        bot.getCommandRegistry().forEach(botCommand -> sb.append(botCommand.command())
+                .append(" - ")
+                .append(botCommand.description())
+                .append("\n"));
+        return sb.toString();
     }
 }

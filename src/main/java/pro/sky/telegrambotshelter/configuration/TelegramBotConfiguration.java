@@ -6,12 +6,14 @@ import org.springframework.context.annotation.Configuration;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Конфигурация телеграм-бота
  */
 @Configuration
 public class TelegramBotConfiguration {
-
     /**
      * Значение токена бота
      */
@@ -21,10 +23,17 @@ public class TelegramBotConfiguration {
     @Bean
     public TelegramCommandBot telegramCommandBot() {
         TelegramCommandBot bot = new TelegramCommandBot(token);
-        for (AvailableCommands commands : AvailableCommands.values()) {
-            bot.registerCommand(commands.getCommand());
-        }
+        List<AvailableCommands> topLevelCommands =
+                Arrays
+                        .stream(AvailableCommands.values())
+                        .filter(AvailableCommands::isTopLevel)
+                        .toList();
+        topLevelCommands
+                .forEach(bot::registerCommand);
         bot.createMainMenu();
+        Arrays
+                .stream(AvailableCommands.values())
+                .forEach(bot::registerCommand);
         return bot;
     }
 
