@@ -2,7 +2,6 @@ package pro.sky.telegrambotshelter.model.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import pro.sky.telegrambotshelter.model.commands.*;
 
 /**
  * Enum класс, содержащий доступные боту команды
@@ -10,96 +9,45 @@ import pro.sky.telegrambotshelter.model.commands.*;
 @RequiredArgsConstructor
 @Getter
 public enum AvailableCommands {
-    START("/start",
-            new StartCommand("/start", "Приветствие пользователя"), false
-    ),
-    HELP("/help",
-            new HelpCommand("/help", "Детальное описание команд"), false
-    ),
-    ADOPT("/adopt",
-            new AdoptCommand("/adopt", "Взять собаку из приюта"), false
-    ),
-    SHELTER_INFO("/shelter_info",
-            new ShelterInfoCommand("/shelter_info", "Узнать информацию о приюте"), false
-    ),
-    REPORT("/report",
-            new ReportCommand("/report", "Прислать отчет о питомце"), false
-    ),
-    CALL_STAFF("/call_staff",
-            new CallStaffCommand("/call_staff", "Позвать волонтера"), true
-    ),
-    ABOUT_SHELTER("/about_shelter",
-            new AboutShelterCommand("/about_shelter", "О приюте."), true
-    ),
-    SHELTER_ADDRESS("/shelter_address",
-            new ShelterAddressCommand("/shelter_address",
-                    "Расписание работы приюта, адрес, схема проезда"), true
-    ),
-    SAFETY_RULES("/safety_rules",
-            new SafetyRulesCommand("/safety_rules",
-                    "Техника безопасности на территории приюта"), true
-    ),
-    MEET_DOG("/meet_dog",
-            new MeetDogCommand("/meet_dog", "Правила знакомства с собакой"), true
-    ),
-    PAPERS("/papers",
-            new PapersCommand("/papers", "Список документов, чтобы взять собаку из приюта"), true
-    ),
-    TRANSPORT_ANIMAL("/transport_animal",
-            new TransportAnimalCommand("/transport_animal",
-                    "Рекомендации по транспортировке животного"), true
-    ),
-    PUPPY_HOME("/puppy_home",
-            new PuppyHomeCommand("/puppy_home",
-                    "Рекомендации по обустройству дома для щенка"), true
-    ),
-    DOG_HOME("/dog_home",
-            new DogHomeCommand("/dog_home",
-                    "Рекомендации по обустройству дома для взрослой собаки"), true
-    ),
+    START("/start", "Приветствие пользователя", true),
+    HELP("/help", "Детальное описание команд", true),
+    ADOPT("/adopt", "Взять собаку из приюта", true),
+    SHELTER_INFO("/shelter_info", "Узнать информацию о приюте", true),
+    REPORT("/report", "Прислать отчет о питомце", true),
+    CALL_STAFF("/call_staff", "Позвать волонтера", true),
+    ABOUT_SHELTER("/about_shelter", "О приюте", false),
+    SHELTER_ADDRESS("/shelter_address", "Расписание работы приюта, адрес, схема проезда", false),
+    SAFETY_RULES("/safety_rules", "Техника безопасности на территории приюта", false),
+    MEET_DOG("/meet_dog", "Правила знакомства с собакой", false),
+    PAPERS("/papers", "Список документов, чтобы взять собаку из приюта", false),
+    TRANSPORT_ANIMAL("/transport_animal", "Рекомендации по транспортировке животного", false),
+    PUPPY_HOME("/puppy_home", "Рекомендации по обустройству дома для щенка", false),
+    DOG_HOME("/dog_home", "Рекомендации по обустройству дома для взрослой собаки", false),
     DISABLED_DOG_HOME("/disabled_dog_home",
-            new DisabledDogHomeCommand("/disabled_dog_home",
-                    "Рекомендации по обустройству дома для собаки с ограниченными возможностями"), true
-    ),
+            "Рекомендации по обустройству дома для собаки с ограниченными возможностями", false),
     COMMUNICATION("/communication",
-            new CommunicationCommand("/communication",
-                    "Советы кинолога по первичному общению с собакой"), true
-    ),
+            "Советы кинолога по первичному общению с собакой", false),
     DOG_HANDLERS("/dog_handlers",
-            new DogHandlersCommand("/dog_handlers",
-                    "Рекомендации по проверенным кинологам для дальнейшего обращения к ним"), true
-    ),
+            "Рекомендации по проверенным кинологам для дальнейшего обращения к ним", false),
     REFUSAL_CAUSE("/refusal_cause",
-            new RefusalCauseCommand("/refusal_cause",
-                    "Список причин, по которым вам могут отказать и не дать забрать собаку из приюта"), true
-    ),
+            "Список причин, по которым вам могут отказать и не дать забрать собаку из приюта", false),
     STORE_CONTACT_INFO("/store_contact_info",
-            new StoreContactInfoCommand("/store_contact_info",
-                    "оставить свои контактные данные для связи"), true
-    ),
+            "оставить свои контактные данные для связи", false),
 
-    SEND_REPORT("/send_report",
-            new SendReportCommand("/send_report", "Отправить отчет о питомце"), true
-    ),
+    SEND_REPORT("/send_report", "Отправить отчет о питомце", false),
 
-    TO_MAIN_MENU("/to_main_menu",
-            new ToMainMenuCommand("/to_main_menu", "В главное меню"), true
-    );
+    TO_MAIN_MENU("/to_main_menu", "В главное меню", false);
     /**
      * Текстовое значение команды
      */
-    private final String value;
+    private final String command;
     /**
-     * Команда в виде {@link pro.sky.telegrambotshelter.model.commands.ExecutableBotCommand ExecutableBotCommand}
+     * Описание команды
      */
-    private final ExecutableBotCommand command;
+    private final String description;
     /**
-     * Является ли командой верхнего уровня или частью подменю
+     * true - команда верхнего уровня, false - команда подменю
      */
-    private final boolean nested;
+    private final boolean topLevel;
 
-    @Override
-    public String toString() {
-        return value;
-    }
 }

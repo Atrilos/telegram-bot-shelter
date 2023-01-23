@@ -4,21 +4,23 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.BotCommand;
 import com.pengrad.telegrambot.model.botcommandscope.BotCommandScopeDefault;
 import com.pengrad.telegrambot.request.SetMyCommands;
-import pro.sky.telegrambotshelter.model.commands.ExecutableBotCommand;
+import lombok.Getter;
+import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Класс, наследующий от стандартного {@link com.pengrad.telegrambot.TelegramBot TelegramBot} и расширяющий его для
  * более удобного использования команд (их парсинга, а также регистрации меню).
  */
+@Getter
 public class TelegramCommandBot extends TelegramBot {
     /**
-     * Список всех доступных команд в виде мапы, где ключами выступают текстовые команды, а значениями
+     * Список всех доступных команд в виде сета, где значениями выступают
      * {@link pro.sky.telegrambotshelter.model.commands.ExecutableBotCommand ExecutableBotCommand}
      */
-    private final Map<String, ExecutableBotCommand> commandRegistry = new HashMap<>();
+    private final Set<BotCommand> commandRegistry = new HashSet<>();
 
     public TelegramCommandBot(String botToken) {
         super(botToken);
@@ -26,61 +28,23 @@ public class TelegramCommandBot extends TelegramBot {
 
     /**
      * Метод для регистрации новых команд
-     * @param executableBotCommand новая команда
+     *
+     * @param availableCommand команда для добавления на основе enum
      * @return true, если команда была успешно добавлена, false - если команда уже существует
      */
-    public boolean registerCommand(ExecutableBotCommand executableBotCommand) {
-        String command = executableBotCommand.command();
-        if (commandRegistry.containsKey(command)) {
-            return false;
-        }
-        commandRegistry.put(command, executableBotCommand);
-        return true;
-    }
-
-    /**
-     * Метод для удаления существующих команд
-     * @param executableBotCommand команда, которую удаляем
-     * @return true, если команда была успешно удалена, false - если команда не существовала
-     */
-    public boolean deregisterCommand(ExecutableBotCommand executableBotCommand) {
-        String command = executableBotCommand.command();
-        if (!commandRegistry.containsKey(command)) {
-            return false;
-        }
-        commandRegistry.remove(command);
-        return true;
-    }
-
-    /**
-     * Метод для удаления существующих команд
-     * @param command текстовая команда, которую удаляем
-     * @return true, если команда была успешно удалена, false - если команда не существовала
-     */
-    public boolean deregisterCommand(String command) {
-        if (!commandRegistry.containsKey(command)) {
-            return false;
-        }
-        commandRegistry.remove(command);
-        return true;
+    public boolean registerCommand(AvailableCommands availableCommand) {
+        BotCommand botCommand = new BotCommand(availableCommand.getCommand(), availableCommand.getDescription());
+        return commandRegistry.add(botCommand);
     }
 
     /**
      * Метод для создания главного меню из зарегистрированных команд
      */
     public void createMainMenu() {
-        BotCommand[] availableBotCommands = commandRegistry.values().toArray(BotCommand[]::new);
+        BotCommand[] availableBotCommands =
+                commandRegistry.toArray(BotCommand[]::new);
         execute(
                 new SetMyCommands(availableBotCommands)
                         .scope(new BotCommandScopeDefault()));
-    }
-
-    /**
-     * Получение команды по ее текстовому значению
-     * @param command текстовое значение команды
-     * @return команда в виде {@link pro.sky.telegrambotshelter.model.commands.ExecutableBotCommand ExecutableBotCommand}
-     */
-    public ExecutableBotCommand getCommand(String command) {
-        return commandRegistry.get(command);
     }
 }

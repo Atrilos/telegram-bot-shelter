@@ -9,6 +9,9 @@ import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.commands.ExecutableBotCommand;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
+import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
+
+import java.util.List;
 
 import static pro.sky.telegrambotshelter.configuration.messages.CommandResponseMessages.UNSUPPORTED_RESPONSE_MSG;
 
@@ -21,10 +24,12 @@ import static pro.sky.telegrambotshelter.configuration.messages.CommandResponseM
 public class MainService {
     private final TelegramCommandBot bot;
     private final UserService userService;
+    private final List<ExecutableBotCommand> botCommands;
 
     /**
      * Метод, производящий аутентификацию пользователя, используя данных из обновления.
      * Получает данные о пользователе из БД, при необходимости создает нового пользователя
+     *
      * @param update полученное обновление
      * @return данные о пользователе из БД
      */
@@ -35,8 +40,9 @@ public class MainService {
 
     /**
      * Разделение полученных сообщений по типу
+     *
      * @param update полученное обновление
-     * @param user данные о пользователе из БД
+     * @param user   данные о пользователе из БД
      */
     public void processMessageByType(Update update, User user) {
         if (update.message().contact() != null) {
@@ -48,27 +54,38 @@ public class MainService {
 
     /**
      * Обработка текстовых сообщений
+     *
      * @param update полученное обновление
-     * @param user данные о пользователе из БД
+     * @param user   данные о пользователе из БД
      */
     private void processTextMessage(Update update, User user) {
         log.info("MainService processTextMessage");
         Long chatId = update.message().chat().id();
-        ExecutableBotCommand receivedCommand = bot.getCommand(update.message().text());
+        ExecutableBotCommand receivedCommand =
+                botCommands.stream()
+                        .filter(c -> c.isSupported(update.message().text(), user.getCurrentMenu()))
+                        .findFirst()
+                        .orElse(null);
         if (receivedCommand == null) {
             bot.execute(new SendMessage(chatId, UNSUPPORTED_RESPONSE_MSG));
         } else {
-            receivedCommand.execute(bot, update, user, userService);
+            receivedCommand.execute(update, user);
         }
     }
 
     /**
      * Обработка полученного {@link com.pengrad.telegrambot.model.Contact контакта}
+     *
      * @param update полученное обновление
      */
     private void processContact(Update update) {
         User updatedUser = userService.registerContact(update.message().contact());
-        bot.getCommand(AvailableCommands.CALL_STAFF.getValue())
-                .execute(bot, update, updatedUser, userService);
+        if (updatedUser.getCurrentMenu() == CurrentMenu.CALL_STAFF) {
+            botCommands
+                    .stream()
+                    .filter(c -> c.isSupported(AvailableCommands.CALL_STAFF.getCommand(), CurrentMenu.CALL_STAFF))
+                    .findAny().orElseThrow()
+                    .execute(update, updatedUser);
+        }
     }
 }
