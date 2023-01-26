@@ -22,6 +22,7 @@ public class TelegramBotConfiguration {
 
     /**
      * Создание бина телеграм бота
+     *
      * @return созданный {@link TelegramCommandBot}
      */
     @Bean
