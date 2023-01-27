@@ -30,7 +30,7 @@ public enum AvailableCommands {
     DOG_HANDLERS("/dog_handlers",
             "Рекомендации по проверенным кинологам для дальнейшего обращения к ним", false),
     REFUSAL_CAUSE("/refusal_cause",
-            "Список причин, по которым вам могут отказать и не дать забрать собаку из приюта", false),
+            "Список причин, по которым вам могут отказать забрать собаку из приюта", false),
     STORE_CONTACT_INFO("/store_contact_info",
             "оставить свои контактные данные для связи", false),
 

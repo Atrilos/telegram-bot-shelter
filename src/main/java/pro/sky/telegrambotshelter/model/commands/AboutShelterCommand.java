@@ -32,7 +32,7 @@ public class AboutShelterCommand extends ExecutableBotCommand {
 
     @PostConstruct
     public void init() {
-        addAllAliases(List.of("О приюте", "О приюте"));
+        addAllAliases(List.of(AvailableCommands.ABOUT_SHELTER.getDescription(), AvailableCommands.ABOUT_SHELTER.getDescription()));
     }
 
     @Override

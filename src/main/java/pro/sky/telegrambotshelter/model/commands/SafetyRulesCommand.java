@@ -32,7 +32,7 @@ public class SafetyRulesCommand extends ExecutableBotCommand {
 
     @PostConstruct
     public void init() {
-        addAllAliases(List.of("Техника безопасности на территории приюта", "Техника безопасности на территории приюта"));
+        addAllAliases(List.of(AvailableCommands.SAFETY_RULES.getDescription(), AvailableCommands.SAFETY_RULES.getDescription()));
     }
 
     @Override
