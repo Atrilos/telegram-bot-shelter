@@ -33,4 +33,8 @@ public class KeyboardUtils {
     public static KeyboardButton[] createKeyboardButton(String text, boolean requestContact) {
         return new KeyboardButton[]{new KeyboardButton(text).requestContact(requestContact)};
     }
+
+    public static KeyboardButton[] createKeyboardButton(String text) {
+        return new KeyboardButton[]{new KeyboardButton(text)};
+    }
 }

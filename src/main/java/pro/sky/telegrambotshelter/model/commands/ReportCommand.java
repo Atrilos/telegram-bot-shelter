@@ -20,7 +20,7 @@ public class ReportCommand extends ExecutableBotCommand {
         super(AvailableCommands.REPORT.getCommand(),
                 AvailableCommands.REPORT.getDescription(),
                 AvailableCommands.REPORT.isTopLevel(),
-                EnumSet.of(CurrentMenu.MAIN)
+                EnumSet.allOf(CurrentMenu.class)
         );
         this.userService = userService;
         this.bot = bot;

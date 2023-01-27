@@ -20,7 +20,7 @@ public class AdoptCommand extends ExecutableBotCommand {
         super(AvailableCommands.ADOPT.getCommand(),
                 AvailableCommands.ADOPT.getDescription(),
                 AvailableCommands.ADOPT.isTopLevel(),
-                EnumSet.of(CurrentMenu.MAIN)
+                EnumSet.allOf(CurrentMenu.class)
         );
         this.userService = userService;
         this.bot = bot;
