@@ -71,6 +71,9 @@ public class MainService {
         } else {
             receivedCommand.execute(update, user);
         }
+        if (receivedCommand == null && user.getCurrentMenu() == CurrentMenu.REPORT){
+            userService.processReport(update, user);
+        }
     }
 
     /**

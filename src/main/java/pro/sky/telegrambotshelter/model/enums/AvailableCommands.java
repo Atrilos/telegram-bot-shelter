@@ -33,9 +33,6 @@ public enum AvailableCommands {
             "Список причин, по которым вам могут отказать и не дать забрать собаку из приюта", false),
     STORE_CONTACT_INFO("/store_contact_info",
             "оставить свои контактные данные для связи", false),
-
-    SEND_REPORT("/send_report", "Отправить отчет о питомце", false),
-
     TO_MAIN_MENU("/to_main_menu", "В главное меню", false);
     /**
      * Текстовое значение команды

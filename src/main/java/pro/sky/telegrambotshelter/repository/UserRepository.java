@@ -16,4 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select u from User u where u.isVolunteer = true")
     List<User> findVolunteers();
 
+    @Query("select u from User u where u.isAdopter = true")
+    List<User> findAllByIsAdopter(Boolean isAdopter);
+
 }

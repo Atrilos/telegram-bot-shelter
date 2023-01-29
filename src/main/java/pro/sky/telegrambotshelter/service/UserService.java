@@ -1,7 +1,11 @@
 package pro.sky.telegrambotshelter.service;
 
 import com.pengrad.telegrambot.model.Contact;
+import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.SendContact;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
@@ -12,9 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 import pro.sky.telegrambotshelter.exception.PrimaryKeyNotNullException;
 import pro.sky.telegrambotshelter.exception.UserNotFoundException;
 import pro.sky.telegrambotshelter.model.User;
+import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.repository.UserRepository;
 
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final TelegramCommandBot bot;
     /**
      * Список волонтеров
      */
@@ -55,7 +62,7 @@ public class UserService {
     /**
      * Event loop обновляющий список волонтеров
      */
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "0 */1 * * * *")// every minute
     @Async
     @Transactional
     public void updateVolunteerList() {
@@ -66,6 +73,29 @@ public class UserService {
                 volunteerList.offerLast(user);
     }
 
+    /**
+     * Проверка отчетов о питомцах
+     */
+    @Scheduled(fixedRate = 86400000) // every day
+    @Async
+    @Transactional
+    public void checkAdoptersReports() {
+        Long availableVolunteerId = getNextVolunteer();
+        Calendar calendar = Calendar.getInstance();
+        int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
+        for (User user : userRepository.findAllByIsAdopter(true)) {
+            if (user.isAdoptionApproved())
+                continue;
+
+            if (today - user.getLastReportDay() > 1 || today - user.getLastPhotoReportDay() > 1) {
+                bot.execute(new SendMessage(user.getChatId(), "Вам следует отправить отчет о питомце"));
+            }
+            if (today - user.getAdoptionDay() >= 30) {
+                bot.execute(new SendMessage(availableVolunteerId, "Испытательный период закончился"));
+                bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+            }
+        }
+    }
 
     /**
      * Метод, регистрирующий пользователя, если запись о нем отсутствует в БД
@@ -110,6 +140,8 @@ public class UserService {
                 .chatId(chatId)
                 .isAdmin(false)
                 .isVolunteer(false)
+                .isAdopter(false)
+                .adoptionApproved(false)
                 .currentMenu(CurrentMenu.MAIN)
                 .build();
         saveEntity(user);
@@ -174,4 +206,34 @@ public class UserService {
         user.setCurrentMenu(newMenu);
         updateEntity(user);
     }
+
+    /**
+     * Обработка отчета пользователя о питомце"
+     *
+     * @param update update от пользователя
+     * @param user    пользователь, отсылающий отчет
+     */
+    public void processReport(Update update, User user){
+        String text = update.message().text();
+        Long availableVolunteerId = getNextVolunteer();
+        Calendar calendar = Calendar.getInstance();
+        int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
+        if (text != null){
+            bot.execute(new SendMessage(availableVolunteerId, "Отчет от пользоваьеля"));
+            bot.execute(new SendMessage(availableVolunteerId, text));
+            bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+            user.setLastReportDay(today);
+        } else {
+            PhotoSize[] photoSizes = update.message().photo();
+            if (photoSizes != null) {
+                for (PhotoSize photoSize : photoSizes) {
+                    bot.execute(new SendMessage(availableVolunteerId, "фото отчет от пользоваьеля"));
+                    bot.execute(new SendPhoto(availableVolunteerId, photoSize.fileId()));
+                    bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+                    user.setLastPhotoReportDay(today);
+                }
+            }
+        }
+    }
+
 }

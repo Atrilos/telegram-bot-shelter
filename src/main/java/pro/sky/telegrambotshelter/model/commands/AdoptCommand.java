@@ -32,7 +32,6 @@ public class AdoptCommand extends ExecutableBotCommand {
 
     static ReplyKeyboardMarkup createReplyKeyboard() {
         KeyboardButton[] meetButton =
-//                KeyboardUtils.createKeyboardButton("Правила знакомства с собакой");
                 KeyboardUtils.createKeyboardButton(AvailableCommands.MEET_DOG.getDescription());
         KeyboardButton[] papersButton =
                 KeyboardUtils.createKeyboardButton(AvailableCommands.PAPERS.getDescription());
