@@ -54,10 +54,40 @@ public class User {
     private Boolean isVolunteer = Boolean.FALSE;
 
     /**
+     * Boolean-флаг для тех, кто взял собаку из приюта
+     */
+    @Column(name = "is_adopter")
+    private Boolean isAdopter = Boolean.FALSE;
+
+    /**
      * Номер телефона пользователя. Обязательное поле при передаче пользователя в качестве контакта волонтеру.
      */
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
+
+    /**
+     * День последнего текстового отчета пользователя.
+     */
+    @Column(name = "last_report_day")
+    private int lastReportDay;
+
+    /**
+     * День последнего фото отчета пользователя.
+     */
+    @Column(name = "last_photo_report_day")
+    private int lastPhotoReportDay;
+
+    /**
+     * День когда животное забрали из приюта.
+     */
+    @Column(name = "adoption_day")
+    private int adoptionDay;
+
+    /**
+     * Испытательный период пройден, животное остается в новом доме.
+     */
+    @Column(name = "adoption_approved")
+    private boolean adoptionApproved;
 
     /**
      * Текущее меню, в котором находится пользователь.
