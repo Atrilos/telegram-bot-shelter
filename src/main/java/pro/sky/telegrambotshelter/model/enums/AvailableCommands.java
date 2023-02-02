@@ -34,6 +34,9 @@ public enum AvailableCommands {
     STORE_CONTACT_INFO("/store_contact_info",
             "оставить свои контактные данные для связи", false),
     TO_MAIN_MENU("/to_main_menu", "В главное меню", false);
+
+
+
     /**
      * Текстовое значение команды
      */
