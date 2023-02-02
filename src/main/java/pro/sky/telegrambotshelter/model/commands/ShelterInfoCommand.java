@@ -52,7 +52,6 @@ public class ShelterInfoCommand extends ExecutableBotCommand {
         ReplyKeyboardMarkup replyKeyboardMarkup = createReplyKeyboard();
         message.replyMarkup(replyKeyboardMarkup);
         bot.execute(message);
-        System.out.println("ShelterInfoCommand message().text " + update.message().text());
         userService.changeCurrentMenu(user, CurrentMenu.SHELTER_INFO);
     }
 }
