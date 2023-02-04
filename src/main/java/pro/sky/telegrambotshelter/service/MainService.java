@@ -8,12 +8,10 @@ import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.commands.ExecutableBotCommand;
-import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
-import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
-
+import pro.sky.telegrambotshelter.model.enums.*;
 import java.util.List;
 
-import static pro.sky.telegrambotshelter.configuration.messages.CommandResponseMessages.UNSUPPORTED_RESPONSE_MSG;
+import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.UNSUPPORTED_COMMAND;
 
 /**
  * Основной сервис для обработки поступающих сообщений
@@ -67,12 +65,16 @@ public class MainService {
                         .findFirst()
                         .orElse(null);
         if (receivedCommand == null) {
-            bot.execute(new SendMessage(chatId, UNSUPPORTED_RESPONSE_MSG));
+            bot.execute(new SendMessage(chatId, UNSUPPORTED_COMMAND));
         } else {
             receivedCommand.execute(update, user);
         }
         if (receivedCommand == null && user.getCurrentMenu() == CurrentMenu.REPORT){
             userService.processReport(update, user);
+        }
+        if (bot.isTestMode()){
+            System.out.println("current menu " + user.getCurrentMenu());
+            System.out.println("current shelter " + user.getCurrentShelter());
         }
     }
 

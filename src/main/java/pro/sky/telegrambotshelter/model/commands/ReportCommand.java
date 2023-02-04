@@ -1,30 +1,23 @@
 package pro.sky.telegrambotshelter.model.commands;
 
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.request.KeyboardButton;
-import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
+import com.pengrad.telegrambot.model.request.*;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Component;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
-import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
-import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
+import pro.sky.telegrambotshelter.model.enums.*;
 import pro.sky.telegrambotshelter.service.UserService;
 import pro.sky.telegrambotshelter.utils.KeyboardUtils;
+import java.util.*;
 
-import java.util.Calendar;
-import java.util.EnumSet;
+import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 
 @Component
 public class ReportCommand extends ExecutableBotCommand {
 
     private final UserService userService;
     private final TelegramCommandBot bot;
-    private final String reportBoth = "Отправьте отчет и фото питомца";
-    private final String reportPhoto = "Отправьте фото питомца";
-    private final String reportText = "Отправьте отчет о питомце";
-    private final String reportSent = "Сегодшяшный отчет отправлен";
-    private final String notAdopter = "Вы не забирали животных из нашего приюта";
 
     public ReportCommand(UserService userService, TelegramCommandBot bot) {
         super(AvailableCommands.REPORT.getCommand(),
@@ -59,19 +52,19 @@ public class ReportCommand extends ExecutableBotCommand {
     public void execute(Update update, User user) {
         Long chatId = update.message().chat().id();
         SendMessage message;
-        boolean needReport = user.getIsAdopter() && !user.isAdoptionApproved();
+        boolean needReport = user.getIsCatAdopterTrial() || !user.getIsDogAdopterTrial();
         if (needReport) {
             if (adopterSentReportToday(user) && adopterSentPhotoToday(user))
-                message = new SendMessage(chatId, reportSent);
+                message = new SendMessage(chatId, REPORT_SENT);
             else if (adopterSentPhotoToday(user))
-                message = new SendMessage(chatId, reportText);
+                message = new SendMessage(chatId, REPORT_TEXT);
             else if (adopterSentReportToday(user))
-                message = new SendMessage(chatId, reportPhoto);
+                message = new SendMessage(chatId, REPORT_PHOTO);
             else
-                message = new SendMessage(chatId, reportBoth);
+                message = new SendMessage(chatId, REPORT_BOTH);
         }
         else
-            message = new SendMessage(chatId, notAdopter);
+            message = new SendMessage(chatId, REPORT_NOT_NEEDED);
 
         if (needReport) {
             ReplyKeyboardMarkup replyKeyboardMarkup = createReplyKeyboard();

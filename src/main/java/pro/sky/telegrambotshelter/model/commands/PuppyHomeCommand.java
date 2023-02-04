@@ -4,21 +4,19 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
-import pro.sky.telegrambotshelter.model.User;
+import pro.sky.telegrambotshelter.model.*;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
-import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
-import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
+import pro.sky.telegrambotshelter.model.enums.*;
 import pro.sky.telegrambotshelter.service.UserService;
 
 import java.util.EnumSet;
-import java.util.List;
+
 
 @Component
 public class PuppyHomeCommand extends ExecutableBotCommand {
 
     private final UserService userService;
     private final TelegramCommandBot bot;
-    private final String puppyHome = "puppyHome";
 
     public PuppyHomeCommand(UserService userService, TelegramCommandBot bot) {
         super(AvailableCommands.PUPPY_HOME.getCommand(),
@@ -32,14 +30,15 @@ public class PuppyHomeCommand extends ExecutableBotCommand {
 
     @PostConstruct
     public void init() {
-        addAllAliases(List.of(AvailableCommands.PUPPY_HOME.getDescription()));
+        addAlias(AvailableCommands.PUPPY_HOME.getDescription());
     }
 
     @Override
     public void execute(Update update, User user) {
         Long chatId = update.message().chat().id();
-        SendMessage message = new SendMessage(chatId, puppyHome);
-        message.replyMarkup(AdoptCommand.createReplyKeyboard());
+        Shelter shelter = userService.getShelter(user);
+        SendMessage message = new SendMessage(chatId, shelter.getPupHome());
+        message.replyMarkup(AdoptCommand.createReplyKeyboard(user));
         bot.execute(message);
     }
 }

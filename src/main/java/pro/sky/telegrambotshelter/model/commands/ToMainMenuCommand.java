@@ -10,7 +10,6 @@ import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.UserService;
 
 import java.util.EnumSet;
-import java.util.List;
 
 @Component
 public class ToMainMenuCommand extends ExecutableBotCommand {
@@ -30,7 +29,7 @@ public class ToMainMenuCommand extends ExecutableBotCommand {
 
     @PostConstruct
     public void init() {
-        addAllAliases(List.of("Назад", "В главное меню"));
+        addAlias(AvailableCommands.TO_MAIN_MENU.getDescription());
     }
 
     @Override

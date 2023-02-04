@@ -11,8 +11,9 @@ import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.UserService;
 import pro.sky.telegrambotshelter.utils.KeyboardUtils;
-
 import java.util.EnumSet;
+
+import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.WHAT_DO_YOU_WANT_TO_KNOW;
 
 @Component
 public class ShelterInfoCommand extends ExecutableBotCommand {
@@ -33,13 +34,13 @@ public class ShelterInfoCommand extends ExecutableBotCommand {
     static ReplyKeyboardMarkup createReplyKeyboard() {
 
         KeyboardButton[] aboutButton =
-                KeyboardUtils.createKeyboardButton("О приюте");
+                KeyboardUtils.createKeyboardButton(AvailableCommands.ABOUT_SHELTER.getDescription());
         KeyboardButton[] addressButton =
-                KeyboardUtils.createKeyboardButton("Расписание работы приюта, адрес, схема проезда");
+                KeyboardUtils.createKeyboardButton(AvailableCommands.SHELTER_ADDRESS.getDescription());
         KeyboardButton[] safetyButton =
-                KeyboardUtils.createKeyboardButton("Техника безопасности на территории приюта");
+                KeyboardUtils.createKeyboardButton(AvailableCommands.SAFETY_RULES.getDescription());
         KeyboardButton[] backButton =
-                KeyboardUtils.createKeyboardButton("Назад");
+                KeyboardUtils.createKeyboardButton(AvailableCommands.TO_MAIN_MENU.getDescription());
 
         return KeyboardUtils.createKeyboard(aboutButton, addressButton, safetyButton, backButton);
     }
@@ -47,12 +48,10 @@ public class ShelterInfoCommand extends ExecutableBotCommand {
     @Override
     public void execute(Update update, User user) {
         Long chatId = update.message().chat().id();
-
-        SendMessage message = new SendMessage(chatId, "Что Вы хотите узнать о приюте?");
+        SendMessage message = new SendMessage(chatId, WHAT_DO_YOU_WANT_TO_KNOW);
         ReplyKeyboardMarkup replyKeyboardMarkup = createReplyKeyboard();
         message.replyMarkup(replyKeyboardMarkup);
         bot.execute(message);
-        System.out.println("ShelterInfoCommand message().text " + update.message().text());
         userService.changeCurrentMenu(user, CurrentMenu.SHELTER_INFO);
     }
 }

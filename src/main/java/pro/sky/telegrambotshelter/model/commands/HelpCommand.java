@@ -3,7 +3,7 @@ package pro.sky.telegrambotshelter.model.commands;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Component;
-import pro.sky.telegrambotshelter.configuration.messages.CommandResponseMessages;
+import pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
@@ -31,6 +31,6 @@ public class HelpCommand extends ExecutableBotCommand {
     @Override
     public void execute(Update update, User user) {
         Long chatId = update.message().chat().id();
-        bot.execute(new SendMessage(chatId, CommandResponseMessages.HELP_RESPONSE_MSG));
+        bot.execute(new SendMessage(chatId, UIstrings.HELP_RESPONSE));
     }
 }

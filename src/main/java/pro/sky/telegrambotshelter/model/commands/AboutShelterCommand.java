@@ -4,23 +4,23 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
-import pro.sky.telegrambotshelter.model.User;
+import pro.sky.telegrambotshelter.model.*;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
-import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
-import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
-import pro.sky.telegrambotshelter.service.UserService;
+import pro.sky.telegrambotshelter.model.enums.*;
+import pro.sky.telegrambotshelter.repository.*;
+import pro.sky.telegrambotshelter.service.*;
 
 import java.util.EnumSet;
-import java.util.List;
+
 
 @Component
 public class AboutShelterCommand extends ExecutableBotCommand {
 
     private final UserService userService;
     private final TelegramCommandBot bot;
-    private final String about = "about";
+    private final ShelterRepository shelterRepository;
 
-    public AboutShelterCommand(UserService userService, TelegramCommandBot bot) {
+    public AboutShelterCommand(UserService userService, TelegramCommandBot bot, ShelterRepository shelterRepository ) {
         super(AvailableCommands.ABOUT_SHELTER.getCommand(),
                 AvailableCommands.ABOUT_SHELTER.getDescription(),
                 AvailableCommands.ABOUT_SHELTER.isTopLevel(),
@@ -28,17 +28,19 @@ public class AboutShelterCommand extends ExecutableBotCommand {
         );
         this.userService = userService;
         this.bot = bot;
+        this.shelterRepository = shelterRepository;
     }
 
     @PostConstruct
     public void init() {
-        addAllAliases(List.of("О приюте", "О приюте"));
+        addAlias(AvailableCommands.ABOUT_SHELTER.getDescription());
     }
 
     @Override
     public void execute(Update update, User user) {
         Long chatId = update.message().chat().id();
-        SendMessage message = new SendMessage(chatId, about);
+        Shelter shelter = userService.getShelter(user);
+        SendMessage message = new SendMessage(chatId, shelter.getAbout());
         message.replyMarkup(ShelterInfoCommand.createReplyKeyboard());
         bot.execute(message);
     }

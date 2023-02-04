@@ -1,28 +1,21 @@
 package pro.sky.telegrambotshelter.service;
 
-import com.pengrad.telegrambot.model.Contact;
-import com.pengrad.telegrambot.model.PhotoSize;
-import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.SendContact;
-import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.request.SendPhoto;
+import com.pengrad.telegrambot.model.*;
+import com.pengrad.telegrambot.request.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pro.sky.telegrambotshelter.exception.PrimaryKeyNotNullException;
-import pro.sky.telegrambotshelter.exception.UserNotFoundException;
+import pro.sky.telegrambotshelter.exception.*;
+import pro.sky.telegrambotshelter.model.Shelter;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
-import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
-import pro.sky.telegrambotshelter.repository.UserRepository;
+import pro.sky.telegrambotshelter.model.enums.*;
+import pro.sky.telegrambotshelter.repository.*;
+import java.util.*;
 
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
+import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 
 /**
  * Сервис для обработки взаимодействий с пользователями
@@ -32,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final ShelterRepository shelterRepository ;
     private final TelegramCommandBot bot;
     /**
      * Список волонтеров
@@ -80,19 +74,23 @@ public class UserService {
     @Async
     @Transactional
     public void checkAdoptersReports() {
+        if (bot.isTestMode())
+            return;
+
         Long availableVolunteerId = getNextVolunteer();
         Calendar calendar = Calendar.getInstance();
         int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
-        for (User user : userRepository.findAllByIsAdopter(true)) {
-            if (user.isAdoptionApproved())
-                continue;
-
-            if (today - user.getLastReportDay() > 1 || today - user.getLastPhotoReportDay() > 1) {
-                bot.execute(new SendMessage(user.getChatId(), "Вам следует отправить отчет о питомце"));
-            }
-            if (today - user.getAdoptionDay() >= 30) {
-                bot.execute(new SendMessage(availableVolunteerId, "Испытательный период закончился"));
-                bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+        for (User user : userRepository.findAll()) {
+            if (user.getIsCatAdopterTrial() || user.getIsDogAdopterTrial()) {
+                if (today - user.getLastReportDay() > 1 || today - user.getLastPhotoReportDay() > 1) {
+                    bot.execute(new SendMessage(user.getChatId(), SHOULD_SEND_REPORT));
+                    bot.execute(new SendMessage(availableVolunteerId, MISSING_REPORT));
+                    bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+                }
+                if (today - user.getAdoptionDay() >= 30) {
+                    bot.execute(new SendMessage(availableVolunteerId, TRIAL_PERIOD_OVER));
+                    bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+                }
             }
         }
     }
@@ -140,9 +138,12 @@ public class UserService {
                 .chatId(chatId)
                 .isAdmin(false)
                 .isVolunteer(false)
-                .isAdopter(false)
-                .adoptionApproved(false)
+                .isDogAdopter(false)
+                .isDogAdopterTrial(false)
+                .isCatAdopter(false)
+                .isCatAdopterTrial(false)
                 .currentMenu(CurrentMenu.MAIN)
+                .currentShelter(ShelterType.DOG)
                 .build();
         saveEntity(user);
     }
@@ -208,6 +209,17 @@ public class UserService {
     }
 
     /**
+     * Изменение текущего типа приюта
+     *
+     * @param user    текущий пользователь
+     * @param shelterType новое значение типа приюта
+     */
+    public void changeCurrentShelterType(User user, ShelterType shelterType) {
+        user.setCurrentShelter(shelterType);
+        updateEntity(user);
+    }
+
+    /**
      * Обработка отчета пользователя о питомце"
      *
      * @param update update от пользователя
@@ -219,7 +231,7 @@ public class UserService {
         Calendar calendar = Calendar.getInstance();
         int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
         if (text != null){
-            bot.execute(new SendMessage(availableVolunteerId, "Отчет от пользоваьеля"));
+            bot.execute(new SendMessage(availableVolunteerId, USER_REPORT));
             bot.execute(new SendMessage(availableVolunteerId, text));
             bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
             user.setLastReportDay(today);
@@ -227,7 +239,7 @@ public class UserService {
             PhotoSize[] photoSizes = update.message().photo();
             if (photoSizes != null) {
                 for (PhotoSize photoSize : photoSizes) {
-                    bot.execute(new SendMessage(availableVolunteerId, "фото отчет от пользоваьеля"));
+                    bot.execute(new SendMessage(availableVolunteerId, USER_PHOTO_REPORT));
                     bot.execute(new SendPhoto(availableVolunteerId, photoSize.fileId()));
                     bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
                     user.setLastPhotoReportDay(today);
@@ -235,5 +247,20 @@ public class UserService {
             }
         }
     }
+
+    /**
+     * Возвращает Shelter
+     *
+     * @param user пользователь
+     */
+    public Shelter getShelter(User user) {
+        boolean catShelter = user.getCurrentShelter() == ShelterType.CAT;
+        List <Shelter> shelters = shelterRepository.findByIsCatShelter(catShelter);
+        if (shelters.size() == 0)
+            throw new ShelterNotFoundException();
+
+        return shelters.get(0);
+    }
+
 
 }

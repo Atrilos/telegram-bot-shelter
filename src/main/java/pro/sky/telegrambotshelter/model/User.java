@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.NaturalId;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
+import pro.sky.telegrambotshelter.model.enums.ShelterType;
 
 import java.util.Objects;
 
@@ -54,10 +55,30 @@ public class User {
     private Boolean isVolunteer = Boolean.FALSE;
 
     /**
+     * Boolean-флаг для тех, кто взял собаку из приюта с испытательным сроком
+     */
+    @Column(name = "is_dog_adopter_trial")
+    private Boolean isDogAdopterTrial = Boolean.FALSE;
+
+
+    /**
      * Boolean-флаг для тех, кто взял собаку из приюта
      */
-    @Column(name = "is_adopter")
-    private Boolean isAdopter = Boolean.FALSE;
+    @Column(name = "is_dog_adopter")
+    private Boolean isDogAdopter = Boolean.FALSE;
+
+    /**
+     * Boolean-флаг для тех, кто взял кошку из приюта с испытательным сроком
+     */
+    @Column(name = "is_cat_adopter_trial")
+    private Boolean isCatAdopterTrial = Boolean.FALSE;
+
+
+    /**
+     * Boolean-флаг для тех, кто взял кошку из приюта
+     */
+    @Column(name = "is_cat_adopter")
+    private Boolean isCatAdopter = Boolean.FALSE;
 
     /**
      * Номер телефона пользователя. Обязательное поле при передаче пользователя в качестве контакта волонтеру.
@@ -84,17 +105,15 @@ public class User {
     private int adoptionDay;
 
     /**
-     * Испытательный период пройден, животное остается в новом доме.
-     */
-    @Column(name = "adoption_approved")
-    private boolean adoptionApproved;
-
-    /**
      * Текущее меню, в котором находится пользователь.
      */
     @Column(name = "current_menu")
     @Enumerated(EnumType.STRING)
     private CurrentMenu currentMenu;
+
+    @Column(name = "current_shelter")
+    @Enumerated(EnumType.STRING)
+    private ShelterType currentShelter;
 
     @PostPersist
     public void logUserAdded() {
