@@ -5,7 +5,7 @@ import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Component;
-import pro.sky.telegrambotshelter.model.Shelter;
+import pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescriptions;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
@@ -55,7 +55,7 @@ public class AdoptCommand extends ExecutableBotCommand {
         KeyboardButton[] refusalCauseButton =
                 KeyboardUtils.createKeyboardButton(AvailableCommands.REFUSAL_CAUSE.getDescription());
         KeyboardButton[] backButton =
-                KeyboardUtils.createKeyboardButton(AvailableCommands.TO_MAIN_MENU.getDescription());
+                KeyboardUtils.createKeyboardButton(CommandDescriptions.TO_MAIN_MENU_DESC);
 
         if (user.getCurrentShelter() == ShelterType.DOG) {
             return KeyboardUtils.createKeyboard(meetButton, papersButton, transportButton, pupHomeButton, homeButton,
@@ -67,7 +67,6 @@ public class AdoptCommand extends ExecutableBotCommand {
 
     @Override
     public void execute(Update update, User user) {
-        Shelter shelter = userService.getShelter(user);
         Long chatId = update.message().chat().id();
         SendMessage message = new SendMessage(chatId, AvailableCommands.ADOPT.getDescription());
         ReplyKeyboardMarkup replyKeyboardMarkup = createReplyKeyboard(user);

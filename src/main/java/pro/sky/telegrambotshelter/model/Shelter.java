@@ -91,7 +91,7 @@ public class Shelter {
     private String dogHome;
 
     /**
-     * Рекомендации по обустройству дома для взрослой собаки
+     * Рекомендации по обустройству дома собаки с ограниченными возможностями
      */
     @Lob
     @Column(name = "disabled_dog_home")
@@ -115,7 +115,7 @@ public class Shelter {
      * Рекомендации по проверенным кинологам для дальнейшего обращения к ним
      */
     @Lob
-    @Column(name = "dog_handlers", nullable = false)
+    @Column(name = "dog_handlers")
     private String dogHandlers;
 
     /**

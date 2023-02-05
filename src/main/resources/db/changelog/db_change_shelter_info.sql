@@ -100,5 +100,8 @@ ALTER TABLE shelter_details
     ALTER COLUMN safety_instructions SET NOT NULL;
 -- rollback alter table shelter_details ALTER COLUMN safety_instructions DROP NOT NULL;
 
-
+-- changeset HARD:1675589377562-12
+ALTER TABLE shelter_details
+    ALTER dog_handlers DROP NOT NULL;
+-- rollback alter table shelter_details alter dog_handlers set not null;
 

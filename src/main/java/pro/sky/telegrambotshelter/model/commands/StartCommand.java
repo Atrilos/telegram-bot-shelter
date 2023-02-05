@@ -36,9 +36,21 @@ public class StartCommand extends ExecutableBotCommand {
         this.userService = userService;
     }
 
+    static ReplyKeyboardMarkup createReplyKeyboardShelterKnown() {
+
+        return createKeyboard(
+                createKeyboardButton(SHELTER_INFO_DESC),
+                createKeyboardButton(ADOPT_DESC),
+                createKeyboardButton(SEND_REPORT_DESC),
+                createKeyboardButton(AvailableCommands.HELP.getCommand()),
+                createKeyboardButton(CALL_STAFF_DESC)
+        );
+
+    }
+
     @PostConstruct
     public void init() {
-        addAllAliases(List.of("Назад", "В главное меню"));
+        addAllAliases(List.of(ALT_TO_MAIN_MENU, TO_MAIN_MENU_DESC));
     }
 
     private ReplyKeyboardMarkup createReplyKeyboardSelectShelter() {
@@ -49,18 +61,6 @@ public class StartCommand extends ExecutableBotCommand {
                 KeyboardUtils.createKeyboardButton(CAT_SHELTER);
 
         return KeyboardUtils.createKeyboard(dogShelterButton, catShelterButton);
-    }
-
-    private ReplyKeyboardMarkup createReplyKeyboardShelterKnown() {
-
-        return createKeyboard(
-                createKeyboardButton(SHELTER_INFO_DESC),
-                createKeyboardButton(ADOPT_DESC),
-                createKeyboardButton(SEND_REPORT_DESC),
-                createKeyboardButton(AvailableCommands.HELP.getCommand()),
-                createKeyboardButton(CALL_STAFF_DESC)
-        );
-
     }
 
     @Override

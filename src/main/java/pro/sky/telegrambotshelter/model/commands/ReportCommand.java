@@ -5,6 +5,7 @@ import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Component;
+import pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescriptions;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
@@ -36,37 +37,46 @@ public class ReportCommand extends ExecutableBotCommand {
 
     static ReplyKeyboardMarkup createReplyKeyboard() {
         KeyboardButton[] backButton =
-                KeyboardUtils.createKeyboardButton(AvailableCommands.TO_MAIN_MENU.getDescription());
+                KeyboardUtils.createKeyboardButton(CommandDescriptions.TO_MAIN_MENU_DESC);
 
         return KeyboardUtils.createKeyboard(backButton);
     }
 
     public boolean adopterSentReportToday(User user) {
         LocalDateTime lastReportDay = user.getLastReportDay();
-        return lastReportDay.get(ChronoField.EPOCH_DAY) == LocalDateTime.now().get(ChronoField.EPOCH_DAY);
+        if (lastReportDay == null) {
+            return false;
+        }
+        return lastReportDay.getLong(ChronoField.EPOCH_DAY) == LocalDateTime.now().getLong(ChronoField.EPOCH_DAY);
     }
 
     public boolean adopterSentPhotoToday(User user) {
         LocalDateTime lastPhotoReportDay = user.getLastPhotoReportDay();
-        return lastPhotoReportDay.get(ChronoField.EPOCH_DAY) == LocalDateTime.now().get(ChronoField.EPOCH_DAY);
+        if (lastPhotoReportDay == null) {
+            return false;
+        }
+        return lastPhotoReportDay.getLong(ChronoField.EPOCH_DAY) == LocalDateTime.now().getLong(ChronoField.EPOCH_DAY);
     }
 
     @Override
     public void execute(Update update, User user) {
         Long chatId = update.message().chat().id();
         SendMessage message;
-        boolean needReport = user.getIsCatAdopterTrial() || !user.getIsDogAdopterTrial();
+        boolean needReport = user.getIsCatAdopterTrial() || user.getIsDogAdopterTrial();
         if (needReport) {
-            if (adopterSentReportToday(user) && adopterSentPhotoToday(user))
+            boolean reportToday = adopterSentReportToday(user);
+            boolean photoToday = adopterSentPhotoToday(user);
+            if (reportToday && photoToday)
                 message = new SendMessage(chatId, REPORT_SENT);
-            else if (adopterSentPhotoToday(user))
+            else if (photoToday)
                 message = new SendMessage(chatId, REPORT_TEXT);
-            else if (adopterSentReportToday(user))
+            else if (reportToday)
                 message = new SendMessage(chatId, REPORT_PHOTO);
             else
                 message = new SendMessage(chatId, REPORT_BOTH);
-        } else
+        } else {
             message = new SendMessage(chatId, REPORT_NOT_NEEDED);
+        }
 
         if (needReport) {
             ReplyKeyboardMarkup replyKeyboardMarkup = createReplyKeyboard();

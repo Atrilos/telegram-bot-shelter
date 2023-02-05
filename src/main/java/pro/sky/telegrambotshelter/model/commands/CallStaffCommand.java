@@ -6,6 +6,7 @@ import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendContact;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Component;
+import pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescriptions;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
@@ -38,7 +39,7 @@ public class CallStaffCommand extends ExecutableBotCommand {
         KeyboardButton[] acceptButton =
                 KeyboardUtils.createKeyboardButton(SEND_YOUR_CONTACT_INFO, true);
         KeyboardButton[] cancelButton =
-                KeyboardUtils.createKeyboardButton(AvailableCommands.TO_MAIN_MENU.getDescription(), false);
+                KeyboardUtils.createKeyboardButton(CommandDescriptions.TO_MAIN_MENU_DESC);
 
         return KeyboardUtils.createKeyboard(acceptButton, cancelButton);
     }

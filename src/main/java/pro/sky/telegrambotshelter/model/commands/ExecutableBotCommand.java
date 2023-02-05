@@ -99,4 +99,5 @@ public abstract class ExecutableBotCommand extends BotCommand {
             return false;
         } else return commandAliases.contains(message);
     }
+
 }
