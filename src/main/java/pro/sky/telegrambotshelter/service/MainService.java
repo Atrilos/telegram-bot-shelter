@@ -82,8 +82,8 @@ public class MainService {
                     .execute(update, user);
         }
         if (bot.isTestMode()) {
-            System.out.println("current menu " + user.getCurrentMenu());
-            System.out.println("current shelter " + user.getCurrentShelter());
+            log.info("current menu {}", user.getCurrentMenu());
+            log.info("current shelter {}", user.getCurrentShelter());
         }
     }
 

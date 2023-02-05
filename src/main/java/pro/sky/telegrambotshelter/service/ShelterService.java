@@ -17,14 +17,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ShelterService {
 
-    public final ShelterRepository shelterRepository;
+    private final ShelterRepository shelterRepository;
     private final TelegramCommandBot bot;
 
     /**
      * Создание двух различных приютов для удобства тестирования
      */
     @PostConstruct
-    public void initShelterRepo() {
+    void initShelterRepo() {
         if (bot.isTestMode()) {
             if (findByIsCatShelter(true).size() == 0) {
                 Shelter catShelter = Shelter.builder()
@@ -71,7 +71,15 @@ public class ShelterService {
      */
     public Shelter getShelter(User user) {
         boolean catShelter = user.getCurrentShelter() == ShelterType.CAT;
-        List<Shelter> shelters = findByIsCatShelter(catShelter);
+        return getShelter(catShelter);
+    }
+
+    /**
+     * Возвращает Shelter
+     * @param isCatShelter Является ли приютом для кошек
+     */
+    public Shelter getShelter(boolean isCatShelter) {
+        List<Shelter> shelters = findByIsCatShelter(isCatShelter);
         if (shelters.size() == 0)
             throw new ShelterNotFoundException();
 
@@ -89,7 +97,7 @@ public class ShelterService {
         shelterRepository.save(shelter);
     }
 
-    public List<Shelter> findByIsCatShelter(boolean isCatShelter) {
+    private List<Shelter> findByIsCatShelter(boolean isCatShelter) {
         return shelterRepository.findByIsCatShelter(isCatShelter);
     }
 }

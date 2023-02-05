@@ -26,6 +26,6 @@ public class CommandDescriptions {
     public static final String ALT_TO_MAIN_MENU = "Назад";
     public static final String CAT_SHELTER_DESC = "Приют для кошек";
     public static final String DOG_SHELTER_DESC = "Приют для собак";
-
-
+    public static final String SELECT_DOG_DESC = "Выбрать собаку для усыновления";
+    public static final String SELECT_CAT_DESC = "Выбрать кошку для усыновления";
 }

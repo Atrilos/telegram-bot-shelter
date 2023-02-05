@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/db_change_shelter_info.sql
   - include:
       file: db/changelog/db_change_user.sql
+  - include:
+      file: db/changelog/db_create_pet.sql

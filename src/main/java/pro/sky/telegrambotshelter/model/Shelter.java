@@ -5,7 +5,9 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Entity-класс, описывающий данные по обслуживаемым приютам для собак
@@ -124,6 +126,9 @@ public class Shelter {
     @Lob
     @Column(name = "refusal_cause", nullable = false)
     private String refusalCause;
+
+    @OneToMany(mappedBy = "shelter")
+    private Set<Pet> pets = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

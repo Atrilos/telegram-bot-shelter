@@ -54,14 +54,18 @@ public class AdoptCommand extends ExecutableBotCommand {
                 KeyboardUtils.createKeyboardButton(AvailableCommands.DOG_HANDLERS.getDescription());
         KeyboardButton[] refusalCauseButton =
                 KeyboardUtils.createKeyboardButton(AvailableCommands.REFUSAL_CAUSE.getDescription());
+        KeyboardButton[] selectDogButton =
+                KeyboardUtils.createKeyboardButton(AvailableCommands.SELECT_DOG.getDescription());
+        KeyboardButton[] selectCatButton =
+                KeyboardUtils.createKeyboardButton(AvailableCommands.SELECT_CAT.getDescription());
         KeyboardButton[] backButton =
                 KeyboardUtils.createKeyboardButton(CommandDescriptions.TO_MAIN_MENU_DESC);
 
         if (user.getCurrentShelter() == ShelterType.DOG) {
-            return KeyboardUtils.createKeyboard(meetButton, papersButton, transportButton, pupHomeButton, homeButton,
+            return KeyboardUtils.createKeyboard(selectDogButton, meetButton, papersButton, transportButton, pupHomeButton, homeButton,
                     disabledDogHomeButton, communicationButton, dogHandlersButton, refusalCauseButton, backButton);
         } else {
-            return KeyboardUtils.createKeyboard(meetButton, papersButton, transportButton, catHomeButton, communicationButton, refusalCauseButton, backButton);
+            return KeyboardUtils.createKeyboard(selectCatButton, meetButton, papersButton, transportButton, catHomeButton, communicationButton, refusalCauseButton, backButton);
         }
     }
 
