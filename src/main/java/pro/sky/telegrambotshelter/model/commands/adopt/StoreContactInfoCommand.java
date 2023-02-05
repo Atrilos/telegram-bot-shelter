@@ -1,4 +1,4 @@
-package pro.sky.telegrambotshelter.model.commands;
+package pro.sky.telegrambotshelter.model.commands.adopt;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescriptions;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
+import pro.sky.telegrambotshelter.model.commands.ExecutableBotCommand;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 

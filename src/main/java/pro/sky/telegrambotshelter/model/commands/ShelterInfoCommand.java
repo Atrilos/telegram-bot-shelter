@@ -33,7 +33,7 @@ public class ShelterInfoCommand extends ExecutableBotCommand {
         this.bot = bot;
     }
 
-    static ReplyKeyboardMarkup createReplyKeyboard() {
+    public static ReplyKeyboardMarkup createReplyKeyboard() {
 
         KeyboardButton[] aboutButton =
                 KeyboardUtils.createKeyboardButton(AvailableCommands.ABOUT_SHELTER.getDescription());

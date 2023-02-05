@@ -1,4 +1,4 @@
-package pro.sky.telegrambotshelter.model.commands;
+package pro.sky.telegrambotshelter.model.commands.shelterInfo;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import pro.sky.telegrambotshelter.model.Shelter;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
+import pro.sky.telegrambotshelter.model.commands.ExecutableBotCommand;
+import pro.sky.telegrambotshelter.model.commands.ShelterInfoCommand;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.ShelterService;
@@ -14,16 +16,16 @@ import java.util.EnumSet;
 
 
 @Component
-public class DisabledDogHomeCommand extends ExecutableBotCommand {
+public class SafetyRulesCommand extends ExecutableBotCommand {
 
     private final ShelterService shelterService;
     private final TelegramCommandBot bot;
 
-    public DisabledDogHomeCommand(ShelterService shelterService, TelegramCommandBot bot) {
-        super(AvailableCommands.DISABLED_DOG_HOME.getCommand(),
-                AvailableCommands.DISABLED_DOG_HOME.getDescription(),
-                AvailableCommands.DISABLED_DOG_HOME.isTopLevel(),
-                EnumSet.of(CurrentMenu.ADOPTION)
+    public SafetyRulesCommand(ShelterService shelterService, TelegramCommandBot bot) {
+        super(AvailableCommands.SAFETY_RULES.getCommand(),
+                AvailableCommands.SAFETY_RULES.getDescription(),
+                AvailableCommands.SAFETY_RULES.isTopLevel(),
+                EnumSet.of(CurrentMenu.SHELTER_INFO)
         );
         this.shelterService = shelterService;
         this.bot = bot;
@@ -33,8 +35,8 @@ public class DisabledDogHomeCommand extends ExecutableBotCommand {
     public void execute(Update update, User user) {
         Long chatId = update.message().chat().id();
         Shelter shelter = shelterService.getShelter(user);
-        SendMessage message = new SendMessage(chatId, shelter.getDisabledDogHome());
-        message.replyMarkup(AdoptCommand.createReplyKeyboard(user));
+        SendMessage message = new SendMessage(chatId, shelter.getSafetyInstructions());
+        message.replyMarkup(ShelterInfoCommand.createReplyKeyboard());
         bot.execute(message);
     }
 }

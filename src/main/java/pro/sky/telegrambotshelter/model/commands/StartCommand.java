@@ -36,7 +36,7 @@ public class StartCommand extends ExecutableBotCommand {
         this.userService = userService;
     }
 
-    static ReplyKeyboardMarkup createReplyKeyboardShelterKnown() {
+    public static ReplyKeyboardMarkup createReplyKeyboardShelterKnown() {
 
         return createKeyboard(
                 createKeyboardButton(SHELTER_INFO_DESC),
