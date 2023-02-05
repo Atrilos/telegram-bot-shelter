@@ -1,15 +1,19 @@
 package pro.sky.telegrambotshelter.model.commands;
 
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.request.*;
+import com.pengrad.telegrambot.model.request.KeyboardButton;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Component;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
-import pro.sky.telegrambotshelter.model.enums.*;
+import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
+import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.UserService;
 import pro.sky.telegrambotshelter.utils.KeyboardUtils;
-import java.util.*;
+
+import java.util.Calendar;
+import java.util.EnumSet;
 
 import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 
@@ -36,13 +40,13 @@ public class ReportCommand extends ExecutableBotCommand {
         return KeyboardUtils.createKeyboard(backButton);
     }
 
-    public boolean adopterSentReportToday(User user){
+    public boolean adopterSentReportToday(User user) {
         Calendar calendar = Calendar.getInstance();
         int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
         return user.getLastReportDay() == today;
     }
 
-    public boolean adopterSentPhotoToday(User user){
+    public boolean adopterSentPhotoToday(User user) {
         Calendar calendar = Calendar.getInstance();
         int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
         return user.getLastPhotoReportDay() == today;
@@ -62,8 +66,7 @@ public class ReportCommand extends ExecutableBotCommand {
                 message = new SendMessage(chatId, REPORT_PHOTO);
             else
                 message = new SendMessage(chatId, REPORT_BOTH);
-        }
-        else
+        } else
             message = new SendMessage(chatId, REPORT_NOT_NEEDED);
 
         if (needReport) {

@@ -1,19 +1,32 @@
 package pro.sky.telegrambotshelter.service;
 
-import com.pengrad.telegrambot.model.*;
-import com.pengrad.telegrambot.request.*;
+import com.pengrad.telegrambot.model.Contact;
+import com.pengrad.telegrambot.model.PhotoSize;
+import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.SendContact;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.*;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pro.sky.telegrambotshelter.exception.*;
+import pro.sky.telegrambotshelter.exception.PrimaryKeyNotNullException;
+import pro.sky.telegrambotshelter.exception.ShelterNotFoundException;
+import pro.sky.telegrambotshelter.exception.UserNotFoundException;
 import pro.sky.telegrambotshelter.model.Shelter;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
-import pro.sky.telegrambotshelter.model.enums.*;
-import pro.sky.telegrambotshelter.repository.*;
-import java.util.*;
+import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
+import pro.sky.telegrambotshelter.model.enums.ShelterType;
+import pro.sky.telegrambotshelter.repository.ShelterRepository;
+import pro.sky.telegrambotshelter.repository.UserRepository;
+
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
 
 import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 
@@ -25,7 +38,7 @@ import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final ShelterRepository shelterRepository ;
+    private final ShelterRepository shelterRepository;
     private final TelegramCommandBot bot;
     /**
      * Список волонтеров
@@ -211,7 +224,7 @@ public class UserService {
     /**
      * Изменение текущего типа приюта
      *
-     * @param user    текущий пользователь
+     * @param user        текущий пользователь
      * @param shelterType новое значение типа приюта
      */
     public void changeCurrentShelterType(User user, ShelterType shelterType) {
@@ -223,14 +236,14 @@ public class UserService {
      * Обработка отчета пользователя о питомце"
      *
      * @param update update от пользователя
-     * @param user    пользователь, отсылающий отчет
+     * @param user   пользователь, отсылающий отчет
      */
-    public void processReport(Update update, User user){
+    public void processReport(Update update, User user) {
         String text = update.message().text();
         Long availableVolunteerId = getNextVolunteer();
         Calendar calendar = Calendar.getInstance();
         int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
-        if (text != null){
+        if (text != null) {
             bot.execute(new SendMessage(availableVolunteerId, USER_REPORT));
             bot.execute(new SendMessage(availableVolunteerId, text));
             bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
@@ -255,7 +268,7 @@ public class UserService {
      */
     public Shelter getShelter(User user) {
         boolean catShelter = user.getCurrentShelter() == ShelterType.CAT;
-        List <Shelter> shelters = shelterRepository.findByIsCatShelter(catShelter);
+        List<Shelter> shelters = shelterRepository.findByIsCatShelter(catShelter);
         if (shelters.size() == 0)
             throw new ShelterNotFoundException();
 

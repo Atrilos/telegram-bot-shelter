@@ -28,6 +28,7 @@ public class Shelter {
      * приют для кошгк
      */
     @Column(name = "is_cat_Shelter")
+    @Builder.Default
     private Boolean isCatShelter = Boolean.FALSE;
 
     /**
@@ -44,73 +45,83 @@ public class Shelter {
     /**
      * Ссылка на карту с местоположением приюта
      */
-    @Column(name = "map_url")
+    @Column(name = "map_url", nullable = false)
     private String mapUrl;
 
     /**
      * Инструкции по правилам безопасности внутри приюта
      */
     @Lob
-    @Column(name = "safety_instructions")
+    @Column(name = "safety_instructions", nullable = false)
     private String safetyInstructions;
 
     /**
      * Правила знакомства с животными
      */
-    @Column(name = "meet", nullable = false)
-    private String meet;
+    @Lob
+    @Column(name = "meeting_rules", nullable = false)
+    private String meetingRules;
 
     /**
      * Список документов, чтобы взять животное из приюта
      */
+    @Lob
     @Column(name = "papers", nullable = false)
     private String papers;
 
     /**
      * Рекомендации по транспортировке животного
      */
+    @Lob
     @Column(name = "transport", nullable = false)
     private String transport;
 
     /**
      * Рекомендации по обустройству дома для щенка
      */
-    @Column(name = "pup_home", nullable = false)
+    @Lob
+    @Column(name = "pup_home")
     private String pupHome;
 
     /**
      * Рекомендации по обустройству дома для взрослой собаки
      */
-    @Column(name = "dog_home", nullable = false)
+    @Lob
+    @Column(name = "dog_home")
     private String dogHome;
 
     /**
      * Рекомендации по обустройству дома для взрослой собаки
      */
-    @Column(name = "disabled_dog_home", nullable = false)
+    @Lob
+    @Column(name = "disabled_dog_home")
     private String disabledDogHome;
 
     /**
      * Рекомендации по обустройству дома для кошки
      */
-    @Column(name = "cat_home", nullable = false)
+    @Lob
+    @Column(name = "cat_home")
     private String catHome;
 
     /**
      * Советы по первичному общению с животным
      */
+    @Lob
     @Column(name = "communication", nullable = false)
     private String communication;
 
     /**
      * Рекомендации по проверенным кинологам для дальнейшего обращения к ним
      */
+    @Lob
     @Column(name = "dog_handlers", nullable = false)
     private String dogHandlers;
 
     /**
      * Причины, по которым вам могут отказать забрать животное из приюта
      */
+    @Lob
     @Column(name = "refusal_cause", nullable = false)
     private String refusalCause;
 

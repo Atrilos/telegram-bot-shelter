@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
       file: db/changelog/db_baseline.sql
+  - include:
+      file: db/changelog/db_change_shelter_info.sql
+  - include:
+      file: db/changelog/db_change_user.sql

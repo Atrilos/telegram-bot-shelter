@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.commands.ExecutableBotCommand;
-import pro.sky.telegrambotshelter.model.enums.*;
+import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
+import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
+
 import java.util.List;
 
 import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.UNSUPPORTED_COMMAND;
@@ -69,10 +71,10 @@ public class MainService {
         } else {
             receivedCommand.execute(update, user);
         }
-        if (receivedCommand == null && user.getCurrentMenu() == CurrentMenu.REPORT){
+        if (receivedCommand == null && user.getCurrentMenu() == CurrentMenu.REPORT) {
             userService.processReport(update, user);
         }
-        if (bot.isTestMode()){
+        if (bot.isTestMode()) {
             System.out.println("current menu " + user.getCurrentMenu());
             System.out.println("current shelter " + user.getCurrentShelter());
         }

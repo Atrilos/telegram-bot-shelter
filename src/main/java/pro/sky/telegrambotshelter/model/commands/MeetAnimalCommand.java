@@ -4,9 +4,10 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
-import pro.sky.telegrambotshelter.model.*;
+import pro.sky.telegrambotshelter.model.Shelter;
+import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
-import pro.sky.telegrambotshelter.model.enums.*;
+import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.UserService;
 
@@ -38,7 +39,7 @@ public class MeetAnimalCommand extends ExecutableBotCommand {
     public void execute(Update update, User user) {
         Long chatId = update.message().chat().id();
         Shelter shelter = userService.getShelter(user);
-        SendMessage message = new SendMessage(chatId, shelter.getMeet());
+        SendMessage message = new SendMessage(chatId, shelter.getMeetingRules());
         message.replyMarkup(AdoptCommand.createReplyKeyboard(user));
         bot.execute(message);
     }
