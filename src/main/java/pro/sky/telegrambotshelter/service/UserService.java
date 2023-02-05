@@ -149,14 +149,6 @@ public class UserService {
         User user = User.builder()
                 .firstName(firstName)
                 .chatId(chatId)
-                .isAdmin(false)
-                .isVolunteer(false)
-                .isDogAdopter(false)
-                .isDogAdopterTrial(false)
-                .isCatAdopter(false)
-                .isCatAdopterTrial(false)
-                .currentMenu(CurrentMenu.MAIN)
-                .currentShelter(ShelterType.DOG)
                 .build();
         saveEntity(user);
     }

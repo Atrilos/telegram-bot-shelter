@@ -2,7 +2,6 @@ package pro.sky.telegrambotshelter.model.commands;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import pro.sky.telegrambotshelter.model.Shelter;
 import pro.sky.telegrambotshelter.model.User;
@@ -27,11 +26,6 @@ public class CatHomeCommand extends ExecutableBotCommand {
         );
         this.userService = userService;
         this.bot = bot;
-    }
-
-    @PostConstruct
-    public void init() {
-        addAlias(AvailableCommands.CAT_HOME.getDescription());
     }
 
     @Override

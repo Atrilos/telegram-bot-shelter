@@ -2,7 +2,6 @@ package pro.sky.telegrambotshelter.model.commands;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import pro.sky.telegrambotshelter.model.Shelter;
 import pro.sky.telegrambotshelter.model.User;
@@ -31,11 +30,6 @@ public class AboutShelterCommand extends ExecutableBotCommand {
         this.userService = userService;
         this.bot = bot;
         this.shelterRepository = shelterRepository;
-    }
-
-    @PostConstruct
-    public void init() {
-        addAlias(AvailableCommands.ABOUT_SHELTER.getDescription());
     }
 
     @Override

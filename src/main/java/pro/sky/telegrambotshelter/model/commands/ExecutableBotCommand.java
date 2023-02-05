@@ -55,6 +55,7 @@ public abstract class ExecutableBotCommand extends BotCommand {
             throw new IllegalArgumentException("command can contain only lowercase English letters, digits and underscores");
         }
         addAlias(command.toLowerCase());
+        addAlias(description);
     }
 
     /**

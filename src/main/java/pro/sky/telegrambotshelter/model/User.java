@@ -115,6 +115,7 @@ public class User {
      */
     @Column(name = "current_menu")
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private CurrentMenu currentMenu = CurrentMenu.MAIN;
 
     @Column(name = "current_shelter")
