@@ -12,7 +12,8 @@ import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.UserService;
 import pro.sky.telegrambotshelter.utils.KeyboardUtils;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
 import java.util.EnumSet;
 
 import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
@@ -41,15 +42,13 @@ public class ReportCommand extends ExecutableBotCommand {
     }
 
     public boolean adopterSentReportToday(User user) {
-        Calendar calendar = Calendar.getInstance();
-        int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
-        return user.getLastReportDay() == today;
+        LocalDateTime lastReportDay = user.getLastReportDay();
+        return lastReportDay.get(ChronoField.EPOCH_DAY) == LocalDateTime.now().get(ChronoField.EPOCH_DAY);
     }
 
     public boolean adopterSentPhotoToday(User user) {
-        Calendar calendar = Calendar.getInstance();
-        int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
-        return user.getLastPhotoReportDay() == today;
+        LocalDateTime lastPhotoReportDay = user.getLastPhotoReportDay();
+        return lastPhotoReportDay.get(ChronoField.EPOCH_DAY) == LocalDateTime.now().get(ChronoField.EPOCH_DAY);
     }
 
     @Override

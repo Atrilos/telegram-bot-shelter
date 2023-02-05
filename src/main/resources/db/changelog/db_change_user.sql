@@ -45,3 +45,23 @@ ALTER TABLE users
     ADD current_shelter VARCHAR(255);
 -- rollback alter table users drop current_shelter;
 
+-- changeset HARD:1675601299593-1
+ALTER TABLE users
+    ALTER COLUMN last_report_day TYPE TIMESTAMP WITHOUT TIME ZONE
+        using to_timestamp(last_report_day);
+-- rollback alter table alter column last_report_day
+-- rollback type INTEGER using (extract(epoch from last_report_day)::integer);
+
+-- changeset HARD:1675601299593-2
+ALTER TABLE users
+    ALTER COLUMN last_photo_report_day TYPE TIMESTAMP WITHOUT TIME ZONE
+        using to_timestamp(last_photo_report_day);
+-- rollback alter table alter column last_photo_report_day
+-- rollback type INTEGER using (extract(epoch from last_photo_report_day)::integer);
+
+-- changeset HARD:1675601299593-3
+ALTER TABLE users
+    ALTER COLUMN adoption_day TYPE TIMESTAMP WITHOUT TIME ZONE
+        using to_timestamp(adoption_day);
+-- rollback alter table alter column adoption_day
+-- rollback type INTEGER using (extract(epoch from adoption_day)::integer);

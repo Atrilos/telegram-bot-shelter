@@ -24,7 +24,8 @@ import pro.sky.telegrambotshelter.model.enums.ShelterType;
 import pro.sky.telegrambotshelter.repository.ShelterRepository;
 import pro.sky.telegrambotshelter.repository.UserRepository;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -91,19 +92,16 @@ public class UserService {
             return;
 
         Long availableVolunteerId = getNextVolunteer();
-        Calendar calendar = Calendar.getInstance();
-        int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
-        for (User user : userRepository.findAll()) {
-            if (user.getIsCatAdopterTrial() || user.getIsDogAdopterTrial()) {
-                if (today - user.getLastReportDay() > 1 || today - user.getLastPhotoReportDay() > 1) {
-                    bot.execute(new SendMessage(user.getChatId(), SHOULD_SEND_REPORT));
-                    bot.execute(new SendMessage(availableVolunteerId, MISSING_REPORT));
-                    bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
-                }
-                if (today - user.getAdoptionDay() >= 30) {
-                    bot.execute(new SendMessage(availableVolunteerId, TRIAL_PERIOD_OVER));
-                    bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
-                }
+        int today = LocalDateTime.now().get(ChronoField.EPOCH_DAY);
+        for (User user : userRepository.findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue()) {
+            if (today - user.getLastReportDay().get(ChronoField.EPOCH_DAY) > 1 || today - user.getLastPhotoReportDay().get(ChronoField.EPOCH_DAY) > 1) {
+                bot.execute(new SendMessage(user.getChatId(), SHOULD_SEND_REPORT));
+                bot.execute(new SendMessage(availableVolunteerId, MISSING_REPORT));
+                bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+            }
+            if (today - user.getAdoptionDay().get(ChronoField.EPOCH_DAY) >= 30) {
+                bot.execute(new SendMessage(availableVolunteerId, TRIAL_PERIOD_OVER));
+                bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
             }
         }
     }
@@ -233,13 +231,11 @@ public class UserService {
     public void processReport(Update update, User user) {
         String text = update.message().text();
         Long availableVolunteerId = getNextVolunteer();
-        Calendar calendar = Calendar.getInstance();
-        int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
         if (text != null) {
             bot.execute(new SendMessage(availableVolunteerId, USER_REPORT));
             bot.execute(new SendMessage(availableVolunteerId, text));
             bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
-            user.setLastReportDay(today);
+            user.setLastReportDay(LocalDateTime.now());
         } else {
             PhotoSize[] photoSizes = update.message().photo();
             if (photoSizes != null) {
@@ -247,7 +243,7 @@ public class UserService {
                     bot.execute(new SendMessage(availableVolunteerId, USER_PHOTO_REPORT));
                     bot.execute(new SendPhoto(availableVolunteerId, photoSize.fileId()));
                     bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
-                    user.setLastPhotoReportDay(today);
+                    user.setLastPhotoReportDay(LocalDateTime.now());
                 }
             }
         }

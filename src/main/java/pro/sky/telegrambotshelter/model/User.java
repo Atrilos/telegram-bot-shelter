@@ -8,6 +8,7 @@ import org.hibernate.annotations.NaturalId;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.model.enums.ShelterType;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -96,19 +97,19 @@ public class User {
      * День последнего текстового отчета пользователя.
      */
     @Column(name = "last_report_day")
-    private Integer lastReportDay;
+    private LocalDateTime lastReportDay;
 
     /**
      * День последнего фото отчета пользователя.
      */
     @Column(name = "last_photo_report_day")
-    private Integer lastPhotoReportDay;
+    private LocalDateTime lastPhotoReportDay;
 
     /**
      * День когда животное забрали из приюта.
      */
     @Column(name = "adoption_day")
-    private Integer adoptionDay;
+    private LocalDateTime adoptionDay;
 
     /**
      * Текущее меню, в котором находится пользователь.
