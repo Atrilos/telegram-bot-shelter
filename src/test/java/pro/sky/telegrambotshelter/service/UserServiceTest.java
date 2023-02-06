@@ -9,12 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import pro.sky.telegrambotshelter.exception.AdoptionDayNullException;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
@@ -43,30 +39,34 @@ class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private TelegramCommandBot bot;
+    @Spy
+    private LinkedHashSet<User> volunteerList;
     @InjectMocks
     private UserService out;
 
     @ParameterizedTest
     @MethodSource("provideParamsForUpdateVolunteer")
-    @SuppressWarnings("unchecked")
-    public void updateVolunteerList(LinkedHashSet<User> registeredVolunteers, Set<User> volunteersInDB, LinkedHashSet<User> expected) {
+    public void updateVolunteerList(LinkedHashSet<User> registeredVolunteers, Set<User> volunteersInDB, LinkedHashSet<User> expected) throws Exception {
         when(userRepository.findVolunteers()).thenReturn(volunteersInDB);
-        ReflectionTestUtils.setField(out, "volunteerList", registeredVolunteers, Set.class);
+        volunteerList = registeredVolunteers;
+        MockitoAnnotations.openMocks(this).close();
+
         out.updateVolunteerList();
-        assertThat((LinkedHashSet<User>) ReflectionTestUtils.getField(out, "volunteerList")).containsExactlyElementsOf(expected);
+
+        assertThat(volunteerList).containsExactlyElementsOf(expected);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void getNextVolunteer() {
+    public void getNextVolunteer() throws Exception {
         LinkedHashSet<User> given = new LinkedHashSet<>(List.of(USER_VOL_A, USER_VOL_B, USER_VOL_C));
         LinkedHashSet<User> expectedSet = new LinkedHashSet<>(List.of(USER_VOL_B, USER_VOL_C, USER_VOL_A));
         Long expectedChatId = USER_VOL_A.getChatId();
-
-        ReflectionTestUtils.setField(out, "volunteerList", given, Set.class);
+        volunteerList = given;
+        MockitoAnnotations.openMocks(this).close();
 
         assertThat(out.getNextVolunteer()).isEqualTo(expectedChatId);
-        assertThat((LinkedHashSet<User>) ReflectionTestUtils.getField(out, "volunteerList")).containsExactlyElementsOf(expectedSet);
+
+        assertThat(volunteerList).containsExactlyElementsOf(expectedSet);
     }
 
     @Test

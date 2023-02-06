@@ -42,10 +42,11 @@ public class UserService {
     /**
      * Список волонтеров
      */
-    private final Set<User> volunteerList = new LinkedHashSet<>();
+    private Set<User> volunteerList;
 
     @PostConstruct
     public void init() {
+        volunteerList = new LinkedHashSet<>();
         updateVolunteerList();
     }
 
