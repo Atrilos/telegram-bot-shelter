@@ -6,8 +6,10 @@ import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
+import pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
+import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.UserService;
 import pro.sky.telegrambotshelter.utils.KeyboardUtils;
@@ -17,10 +19,9 @@ import java.util.List;
 
 import static pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescriptions.ALT_TO_MAIN_MENU;
 import static pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescriptions.TO_MAIN_MENU_DESC;
-import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
-import static pro.sky.telegrambotshelter.utils.KeyboardUtils.createKeyboard;
-import static pro.sky.telegrambotshelter.utils.KeyboardUtils.createKeyboardButton;
-import static pro.sky.telegrambotshelter.model.enums.AvailableCommands.*;
+import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.SELECT_SHELTER;
+import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.START_RESPONSE;
+import static pro.sky.telegrambotshelter.model.enums.AvailableCommands.START;
 import static pro.sky.telegrambotshelter.utils.KeyboardUtils.createKeyboard;
 import static pro.sky.telegrambotshelter.utils.KeyboardUtils.createKeyboardButton;
 
@@ -28,12 +29,6 @@ import static pro.sky.telegrambotshelter.utils.KeyboardUtils.createKeyboardButto
 public class StartCommand extends ExecutableBotCommand {
     private final TelegramCommandBot bot;
     private final UserService userService;
-
-    public StartCommand(TelegramCommandBot bot, UserService userService) {
-        super(AvailableCommands.START.getCommand(),
-                AvailableCommands.START.getDescription(),
-                AvailableCommands.START.isTopLevel(),
-                EnumSet.allOf(CurrentMenu.class)
 
     public StartCommand(TelegramCommandBot bot, UserService userService) {
         super(START.getCommand(),
@@ -65,9 +60,9 @@ public class StartCommand extends ExecutableBotCommand {
     private ReplyKeyboardMarkup createReplyKeyboardSelectShelter() {
 
         KeyboardButton[] dogShelterButton =
-                KeyboardUtils.createKeyboardButton(DOG_SHELTER);
+                KeyboardUtils.createKeyboardButton(UIstrings.DOG_SHELTER);
         KeyboardButton[] catShelterButton =
-                KeyboardUtils.createKeyboardButton(CAT_SHELTER);
+                KeyboardUtils.createKeyboardButton(UIstrings.CAT_SHELTER);
 
         return KeyboardUtils.createKeyboard(dogShelterButton, catShelterButton);
     }
