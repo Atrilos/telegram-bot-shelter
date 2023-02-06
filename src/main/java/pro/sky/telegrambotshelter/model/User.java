@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.NaturalId;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
+import pro.sky.telegrambotshelter.model.enums.ShelterType;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -45,19 +47,45 @@ public class User {
      * Boolean-флаг наличия прав администратора
      */
     @Column(name = "is_admin")
+    @Builder.Default
     private Boolean isAdmin = Boolean.FALSE;
 
     /**
      * Boolean-флаг наличия прав волонтера
      */
     @Column(name = "is_volunteer")
+    @Builder.Default
     private Boolean isVolunteer = Boolean.FALSE;
+
+    /**
+     * Boolean-флаг для тех, кто взял собаку из приюта с испытательным сроком
+     */
+    @Column(name = "is_dog_adopter_trial")
+    @Builder.Default
+    private Boolean isDogAdopterTrial = Boolean.FALSE;
+
 
     /**
      * Boolean-флаг для тех, кто взял собаку из приюта
      */
-    @Column(name = "is_adopter")
-    private Boolean isAdopter = Boolean.FALSE;
+    @Column(name = "is_dog_adopter")
+    @Builder.Default
+    private Boolean isDogAdopter = Boolean.FALSE;
+
+    /**
+     * Boolean-флаг для тех, кто взял кошку из приюта с испытательным сроком
+     */
+    @Column(name = "is_cat_adopter_trial")
+    @Builder.Default
+    private Boolean isCatAdopterTrial = Boolean.FALSE;
+
+
+    /**
+     * Boolean-флаг для тех, кто взял кошку из приюта
+     */
+    @Column(name = "is_cat_adopter")
+    @Builder.Default
+    private Boolean isCatAdopter = Boolean.FALSE;
 
     /**
      * Номер телефона пользователя. Обязательное поле при передаче пользователя в качестве контакта волонтеру.
@@ -69,32 +97,31 @@ public class User {
      * День последнего текстового отчета пользователя.
      */
     @Column(name = "last_report_day")
-    private int lastReportDay;
+    private LocalDateTime lastReportDay;
 
     /**
      * День последнего фото отчета пользователя.
      */
     @Column(name = "last_photo_report_day")
-    private int lastPhotoReportDay;
+    private LocalDateTime lastPhotoReportDay;
 
     /**
      * День когда животное забрали из приюта.
      */
     @Column(name = "adoption_day")
-    private int adoptionDay;
-
-    /**
-     * Испытательный период пройден, животное остается в новом доме.
-     */
-    @Column(name = "adoption_approved")
-    private boolean adoptionApproved;
+    private LocalDateTime adoptionDay;
 
     /**
      * Текущее меню, в котором находится пользователь.
      */
     @Column(name = "current_menu")
     @Enumerated(EnumType.STRING)
-    private CurrentMenu currentMenu;
+    @Builder.Default
+    private CurrentMenu currentMenu = CurrentMenu.MAIN;
+
+    @Column(name = "current_shelter")
+    @Enumerated(EnumType.STRING)
+    private ShelterType currentShelter;
 
     @PostPersist
     public void logUserAdded() {

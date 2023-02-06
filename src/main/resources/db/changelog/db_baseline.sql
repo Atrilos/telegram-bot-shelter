@@ -58,4 +58,3 @@ alter table users
 alter table users
     alter column current_menu set default 'MAIN';
 -- rollback alter table users alter column current_menu set default 'BASIC_STATE';
-
