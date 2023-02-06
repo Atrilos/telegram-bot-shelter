@@ -22,6 +22,7 @@ public class UIstrings {
     public static final String REPORT_PHOTO = "Отправьте фото питомца";
     public static final String REPORT_TEXT = "Отправьте отчет о питомце";
     public static final String REPORT_SENT = "Отчет за сегодня отправлен";
+    public static final String REPORT_SENT_RESPONSE = "Отчет за сегодня отправлен волонтеру. Спасибо!";
     public static final String REPORT_NOT_NEEDED = "Вам не нужно отправлять отчет о питомце";
     public static final String CAT_SHELTER = "Приют для кошек";
     public static final String DOG_SHELTER = "Приют для собак";

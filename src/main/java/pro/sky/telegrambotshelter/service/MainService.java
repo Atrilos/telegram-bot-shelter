@@ -73,14 +73,6 @@ public class MainService {
         } else {
             receivedCommand.execute(update, user);
         }
-        if (receivedCommand == null && user.getCurrentMenu() == CurrentMenu.REPORT) {
-            userService.processReport(update, user);
-            botCommands
-                    .stream()
-                    .filter(c -> c.getClass() == StartCommand.class)
-                    .findAny().orElseThrow()
-                    .execute(update, user);
-        }
         if (bot.isTestMode()) {
             log.info("current menu {}", user.getCurrentMenu());
             log.info("current shelter {}", user.getCurrentShelter());
@@ -102,6 +94,11 @@ public class MainService {
                     .execute(update, updatedUser);
         } else {
             bot.execute(new SendMessage(updatedUser.getChatId(), CONTACT_SUCCESSFULLY_ADDED));
+            botCommands
+                    .stream()
+                    .filter(c -> c.getClass() == StartCommand.class)
+                    .findAny().orElseThrow()
+                    .execute(update, updatedUser);
         }
     }
 }
