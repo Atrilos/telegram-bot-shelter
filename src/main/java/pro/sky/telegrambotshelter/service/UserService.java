@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pro.sky.telegrambotshelter.exception.AdoptionDayNullException;
 import pro.sky.telegrambotshelter.exception.PrimaryKeyNotNullException;
 import pro.sky.telegrambotshelter.exception.UserNotFoundException;
 import pro.sky.telegrambotshelter.model.User;
@@ -41,7 +42,7 @@ public class UserService {
     /**
      * Список волонтеров
      */
-    private final LinkedHashSet<User> volunteerList = new LinkedHashSet<>();
+    private final Set<User> volunteerList = new LinkedHashSet<>();
 
     @PostConstruct
     public void init() {
@@ -91,14 +92,25 @@ public class UserService {
         Long availableVolunteerId = getNextVolunteer();
         long today = LocalDateTime.now().getLong(ChronoField.EPOCH_DAY);
         for (User user : userRepository.findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue()) {
-            if (today - user.getLastReportDay().getLong(ChronoField.EPOCH_DAY) > 1 ||
-                today - user.getLastPhotoReportDay().getLong(ChronoField.EPOCH_DAY) > 1) {
+            Long lastReportDay = user.getLastReportDay() == null ?
+                    null : user.getLastReportDay().getLong(ChronoField.EPOCH_DAY);
+            Long lastPhotoReportDay = user.getLastPhotoReportDay() == null ?
+                    null : user.getLastPhotoReportDay().getLong(ChronoField.EPOCH_DAY);
+            Long adoptionDay = user.getAdoptionDay() == null ?
+                    null : user.getAdoptionDay().getLong(ChronoField.EPOCH_DAY);
+
+            if (adoptionDay == null) {
+                throw new AdoptionDayNullException("Adoption day can't be null for %s if trial-flag set to true"
+                        .formatted(user));
+            }
+
+            if (today - adoptionDay >= 30) {
+                bot.execute(new SendMessage(availableVolunteerId, TRIAL_PERIOD_OVER));
+                bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+            } else if (lastReportDay == null || lastPhotoReportDay == null ||
+                today - lastReportDay > 1 || today - lastPhotoReportDay > 1) {
                 bot.execute(new SendMessage(user.getChatId(), SHOULD_SEND_REPORT));
                 bot.execute(new SendMessage(availableVolunteerId, MISSING_REPORT));
-                bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
-            }
-            if (today - user.getAdoptionDay().getLong(ChronoField.EPOCH_DAY) >= 30) {
-                bot.execute(new SendMessage(availableVolunteerId, TRIAL_PERIOD_OVER));
                 bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
             }
         }
