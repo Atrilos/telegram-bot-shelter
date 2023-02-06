@@ -9,5 +9,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum CurrentMenu {
-    MAIN, SELECT_SHELTER, SHELTER_INFO, ADOPTION, REPORT, CALL_STAFF
+    MAIN, SELECT_SHELTER, SHELTER_INFO, ADOPTION, REPORT, CALL_STAFF, PET_SELECTION
 }

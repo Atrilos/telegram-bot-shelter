@@ -55,6 +55,7 @@ public abstract class ExecutableBotCommand extends BotCommand {
             throw new IllegalArgumentException("command can contain only lowercase English letters, digits and underscores");
         }
         addAlias(command.toLowerCase());
+        addAlias(description);
     }
 
     /**
@@ -92,10 +93,9 @@ public abstract class ExecutableBotCommand extends BotCommand {
      * @return true - команда может использоваться, false - в ином случае
      */
     public boolean isSupported(String message, CurrentMenu currentMenu) {
-//        System.out.println("supportedMenuList.contains " + currentMenu + " " + supportedMenuList.contains(currentMenu));
-//        System.out.println("commandAliases.contains " + message + " " + commandAliases.contains(message));
         if (!supportedMenuList.contains(currentMenu)) {
             return false;
         } else return commandAliases.contains(message);
     }
+
 }

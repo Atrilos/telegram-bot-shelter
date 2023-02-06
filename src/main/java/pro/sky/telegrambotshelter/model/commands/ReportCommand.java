@@ -1,16 +1,23 @@
 package pro.sky.telegrambotshelter.model.commands;
 
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.request.*;
+import com.pengrad.telegrambot.model.request.KeyboardButton;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Component;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
-import pro.sky.telegrambotshelter.model.enums.*;
+import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
+import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.UserService;
 import pro.sky.telegrambotshelter.utils.KeyboardUtils;
-import java.util.*;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
+import java.util.EnumSet;
+import java.util.Objects;
+
+import static pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescriptions.TO_MAIN_MENU_DESC;
 import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 
 @Component
@@ -31,40 +38,63 @@ public class ReportCommand extends ExecutableBotCommand {
 
     static ReplyKeyboardMarkup createReplyKeyboard() {
         KeyboardButton[] backButton =
-                KeyboardUtils.createKeyboardButton(AvailableCommands.TO_MAIN_MENU.getDescription());
+                KeyboardUtils.createKeyboardButton(TO_MAIN_MENU_DESC);
 
         return KeyboardUtils.createKeyboard(backButton);
     }
 
-    public boolean adopterSentReportToday(User user){
-        Calendar calendar = Calendar.getInstance();
-        int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
-        return user.getLastReportDay() == today;
+    public boolean adopterSentReportToday(User user) {
+        LocalDateTime lastReportDay = user.getLastReportDay();
+        if (lastReportDay == null) {
+            return false;
+        }
+        return lastReportDay.getLong(ChronoField.EPOCH_DAY) == LocalDateTime.now().getLong(ChronoField.EPOCH_DAY);
     }
 
-    public boolean adopterSentPhotoToday(User user){
-        Calendar calendar = Calendar.getInstance();
-        int today = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
-        return user.getLastPhotoReportDay() == today;
+    public boolean adopterSentPhotoToday(User user) {
+        LocalDateTime lastPhotoReportDay = user.getLastPhotoReportDay();
+        if (lastPhotoReportDay == null) {
+            return false;
+        }
+        return lastPhotoReportDay.getLong(ChronoField.EPOCH_DAY) == LocalDateTime.now().getLong(ChronoField.EPOCH_DAY);
     }
 
     @Override
     public void execute(Update update, User user) {
         Long chatId = update.message().chat().id();
+        if (user.getCurrentMenu() != CurrentMenu.REPORT) {
+            requestReport(user, chatId);
+        } else {
+            processReport(user, update, chatId);
+        }
+    }
+
+    private void processReport(User user, Update update, Long chatId) {
+        userService.processReport(update, user);
+        SendMessage message = new SendMessage(chatId, REPORT_SENT_RESPONSE);
+        ReplyKeyboardMarkup replyKeyboardMarkup = StartCommand.createReplyKeyboardShelterKnown();
+        message.replyMarkup(replyKeyboardMarkup);
+        userService.changeCurrentMenu(user, CurrentMenu.MAIN);
+        bot.execute(message);
+    }
+
+    private void requestReport(User user, Long chatId) {
         SendMessage message;
-        boolean needReport = user.getIsCatAdopterTrial() || !user.getIsDogAdopterTrial();
+        boolean needReport = user.getIsCatAdopterTrial() || user.getIsDogAdopterTrial();
         if (needReport) {
-            if (adopterSentReportToday(user) && adopterSentPhotoToday(user))
+            boolean reportToday = adopterSentReportToday(user);
+            boolean photoToday = adopterSentPhotoToday(user);
+            if (reportToday && photoToday)
                 message = new SendMessage(chatId, REPORT_SENT);
-            else if (adopterSentPhotoToday(user))
+            else if (photoToday)
                 message = new SendMessage(chatId, REPORT_TEXT);
-            else if (adopterSentReportToday(user))
+            else if (reportToday)
                 message = new SendMessage(chatId, REPORT_PHOTO);
             else
                 message = new SendMessage(chatId, REPORT_BOTH);
-        }
-        else
+        } else {
             message = new SendMessage(chatId, REPORT_NOT_NEEDED);
+        }
 
         if (needReport) {
             ReplyKeyboardMarkup replyKeyboardMarkup = createReplyKeyboard();
@@ -72,5 +102,11 @@ public class ReportCommand extends ExecutableBotCommand {
             userService.changeCurrentMenu(user, CurrentMenu.REPORT);
         }
         bot.execute(message);
+    }
+
+    @Override
+    public boolean isSupported(String message, CurrentMenu currentMenu) {
+        return super.isSupported(message, currentMenu) ||
+               (currentMenu == CurrentMenu.REPORT && !Objects.equals(message, TO_MAIN_MENU_DESC));
     }
 }

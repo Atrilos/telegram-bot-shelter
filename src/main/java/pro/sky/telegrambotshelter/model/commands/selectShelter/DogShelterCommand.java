@@ -1,11 +1,13 @@
-package pro.sky.telegrambotshelter.model.commands;
+package pro.sky.telegrambotshelter.model.commands.selectShelter;
 
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
-import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
+import pro.sky.telegrambotshelter.model.commands.ExecutableBotCommand;
+import pro.sky.telegrambotshelter.model.commands.StartCommand;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.model.enums.ShelterType;
@@ -31,17 +33,14 @@ public class DogShelterCommand extends ExecutableBotCommand {
         this.bot = bot;
     }
 
-    @PostConstruct
-    public void init() {
-        addAlias(AvailableCommands.DOG_SHELTER.getDescription());
-    }
-
     @Override
     public void execute(Update update, User user) {
         Long chatId = update.message().chat().id();
-        SendMessage message = new SendMessage(chatId, DOG_SHELTER_SELECTED);
-        bot.execute(message);
         userService.changeCurrentShelterType(user, ShelterType.DOG);
         userService.changeCurrentMenu(user, CurrentMenu.MAIN);
+        SendMessage message = new SendMessage(chatId, DOG_SHELTER_SELECTED);
+        ReplyKeyboardMarkup replyKeyboardMarkup = StartCommand.createReplyKeyboardShelterKnown();
+        message.replyMarkup(replyKeyboardMarkup);
+        bot.execute(message);
     }
 }

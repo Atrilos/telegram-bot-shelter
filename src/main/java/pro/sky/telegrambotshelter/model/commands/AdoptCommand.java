@@ -5,7 +5,7 @@ import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Component;
-import pro.sky.telegrambotshelter.model.Shelter;
+import pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescriptions;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
@@ -32,7 +32,7 @@ public class AdoptCommand extends ExecutableBotCommand {
         this.bot = bot;
     }
 
-    static ReplyKeyboardMarkup createReplyKeyboard(User user) {
+    public static ReplyKeyboardMarkup createReplyKeyboard(User user) {
 
         KeyboardButton[] meetButton =
                 KeyboardUtils.createKeyboardButton(AvailableCommands.MEET_ANIMAL.getDescription());
@@ -54,20 +54,26 @@ public class AdoptCommand extends ExecutableBotCommand {
                 KeyboardUtils.createKeyboardButton(AvailableCommands.DOG_HANDLERS.getDescription());
         KeyboardButton[] refusalCauseButton =
                 KeyboardUtils.createKeyboardButton(AvailableCommands.REFUSAL_CAUSE.getDescription());
+        KeyboardButton[] selectDogButton =
+                KeyboardUtils.createKeyboardButton(AvailableCommands.SELECT_DOG.getDescription());
+        KeyboardButton[] selectCatButton =
+                KeyboardUtils.createKeyboardButton(AvailableCommands.SELECT_CAT.getDescription());
+        KeyboardButton[] storeContactInfoButton =
+                KeyboardUtils.createKeyboardButton(AvailableCommands.STORE_CONTACT_INFO.getDescription());
         KeyboardButton[] backButton =
-                KeyboardUtils.createKeyboardButton(AvailableCommands.TO_MAIN_MENU.getDescription());
+                KeyboardUtils.createKeyboardButton(CommandDescriptions.TO_MAIN_MENU_DESC);
 
         if (user.getCurrentShelter() == ShelterType.DOG) {
-            return KeyboardUtils.createKeyboard(meetButton, papersButton, transportButton, pupHomeButton, homeButton,
-                    disabledDogHomeButton, communicationButton, dogHandlersButton, refusalCauseButton, backButton);
+            return KeyboardUtils.createKeyboard(selectDogButton, meetButton, papersButton, transportButton, pupHomeButton, homeButton,
+                    disabledDogHomeButton, communicationButton, dogHandlersButton, refusalCauseButton, storeContactInfoButton, backButton);
         } else {
-            return KeyboardUtils.createKeyboard(meetButton, papersButton, transportButton, catHomeButton, communicationButton, refusalCauseButton, backButton);
+            return KeyboardUtils.createKeyboard(selectCatButton, meetButton, papersButton, transportButton, catHomeButton,
+                    communicationButton, refusalCauseButton, storeContactInfoButton, backButton);
         }
     }
 
     @Override
     public void execute(Update update, User user) {
-        Shelter shelter = userService.getShelter(user);
         Long chatId = update.message().chat().id();
         SendMessage message = new SendMessage(chatId, AvailableCommands.ADOPT.getDescription());
         ReplyKeyboardMarkup replyKeyboardMarkup = createReplyKeyboard(user);

@@ -7,10 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
+import pro.sky.telegrambotshelter.model.commands.CallStaffCommand;
 import pro.sky.telegrambotshelter.model.commands.ExecutableBotCommand;
-import pro.sky.telegrambotshelter.model.enums.*;
+import pro.sky.telegrambotshelter.model.commands.StartCommand;
+import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
+
 import java.util.List;
 
+import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.CONTACT_SUCCESSFULLY_ADDED;
 import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.UNSUPPORTED_COMMAND;
 
 /**
@@ -69,12 +73,9 @@ public class MainService {
         } else {
             receivedCommand.execute(update, user);
         }
-        if (receivedCommand == null && user.getCurrentMenu() == CurrentMenu.REPORT){
-            userService.processReport(update, user);
-        }
-        if (bot.isTestMode()){
-            System.out.println("current menu " + user.getCurrentMenu());
-            System.out.println("current shelter " + user.getCurrentShelter());
+        if (bot.isTestMode()) {
+            log.info("current menu {}", user.getCurrentMenu());
+            log.info("current shelter {}", user.getCurrentShelter());
         }
     }
 
@@ -88,7 +89,14 @@ public class MainService {
         if (updatedUser.getCurrentMenu() == CurrentMenu.CALL_STAFF) {
             botCommands
                     .stream()
-                    .filter(c -> c.isSupported(AvailableCommands.CALL_STAFF.getCommand(), CurrentMenu.CALL_STAFF))
+                    .filter(c -> c.getClass() == CallStaffCommand.class)
+                    .findAny().orElseThrow()
+                    .execute(update, updatedUser);
+        } else {
+            bot.execute(new SendMessage(updatedUser.getChatId(), CONTACT_SUCCESSFULLY_ADDED));
+            botCommands
+                    .stream()
+                    .filter(c -> c.getClass() == StartCommand.class)
                     .findAny().orElseThrow()
                     .execute(update, updatedUser);
         }

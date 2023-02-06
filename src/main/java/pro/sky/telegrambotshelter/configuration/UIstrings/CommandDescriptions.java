@@ -16,15 +16,16 @@ public class CommandDescriptions {
     public static final String TRANSPORT_ANIMAL_DESC = "Рекомендации по транспортировке животного";
     public static final String PUP_HOME_DESC = "Рекомендации по обустройству дома для щенка";
     public static final String DOG_HOME_DESC = "Рекомендации по обустройству дома для взрослой собаки";
-    public static final String CAT_HOME_DESC = "Рекомендации по обустройству дома для кощки";
+    public static final String CAT_HOME_DESC = "Рекомендации по обустройству дома для кошки";
     public static final String DISABLED_DOG_HOME_DESC = "Рекомендации по обустройству дома для собаки с ограниченными возможностями";
     public static final String COMMUNICATION_DESC = "Советы по первичному общению с животным";
-    public static final String DOG_HANDLERS_DESC = "Рекомендации по проверенным кинологам для дальнейшего обращения к ним";
+    public static final String DOG_HANDLERS_DESC = "Рекомендации по проверенным кинологам для дальнейшего обращения";
     public static final String REFUSAL_CAUSE_DESC = "Причины, по которым вам могут отказать забрать животное из приюта";
     public static final String STORE_CONTACT_INFO_DESC = "Оставить свои контактные данные для связи";
     public static final String TO_MAIN_MENU_DESC = "В главное меню";
+    public static final String ALT_TO_MAIN_MENU = "Назад";
     public static final String CAT_SHELTER_DESC = "Приют для кошек";
     public static final String DOG_SHELTER_DESC = "Приют для собак";
-
-
+    public static final String SELECT_DOG_DESC = "Выбрать собаку для усыновления";
+    public static final String SELECT_CAT_DESC = "Выбрать кошку для усыновления";
 }

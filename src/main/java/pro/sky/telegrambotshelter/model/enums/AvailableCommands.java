@@ -31,9 +31,10 @@ public enum AvailableCommands {
     DOG_HANDLERS("/dog_handlers", DOG_HANDLERS_DESC, false),
     REFUSAL_CAUSE("/refusal_cause", REFUSAL_CAUSE_DESC, false),
     STORE_CONTACT_INFO("/store_contact_info", STORE_CONTACT_INFO_DESC, false),
-    TO_MAIN_MENU("/to_main_menu", TO_MAIN_MENU_DESC, false),
     CAT_SHELTER("/cat_shelter", CAT_SHELTER_DESC, false),
-    DOG_SHELTER("/dog_shelter", DOG_SHELTER_DESC, false);
+    DOG_SHELTER("/dog_shelter", DOG_SHELTER_DESC, false),
+    SELECT_DOG("/select_dog", SELECT_DOG_DESC, false),
+    SELECT_CAT("/select_dog", SELECT_CAT_DESC, false);
     /**
      * Текстовое значение команды
      */

@@ -1,6 +1,7 @@
 package pro.sky.telegrambotshelter.repository;
 
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import pro.sky.telegrambotshelter.model.User;
 
@@ -16,14 +17,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findVolunteers();
 
     @Query("select u from User u where u.isCatAdopter = true")
-    List<User> findByIsCatAdopter(Boolean isAdopter);
+    List<User> findByIsCatAdopter();
 
     @Query("select u from User u where u.isCatAdopterTrial = true")
-    List<User> findByIsCatAdopterTrial(Boolean isAdopter);
+    List<User> findByIsCatAdopterTrial();
 
     @Query("select u from User u where u.isDogAdopter = true")
-    List<User> findByIsDogAdopter(Boolean isAdopter);
+    List<User> findByIsDogAdopter();
 
     @Query("select u from User u where u.isDogAdopterTrial = true")
-    List<User> findByIsDogAdopterTrial(Boolean isAdopter);
+    List<User> findByIsDogAdopterTrial();
+
+    List<User> findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue();
 }

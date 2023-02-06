@@ -5,12 +5,14 @@ import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Component;
+import pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescriptions;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.UserService;
 import pro.sky.telegrambotshelter.utils.KeyboardUtils;
+
 import java.util.EnumSet;
 
 import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.WHAT_DO_YOU_WANT_TO_KNOW;
@@ -31,7 +33,7 @@ public class ShelterInfoCommand extends ExecutableBotCommand {
         this.bot = bot;
     }
 
-    static ReplyKeyboardMarkup createReplyKeyboard() {
+    public static ReplyKeyboardMarkup createReplyKeyboard() {
 
         KeyboardButton[] aboutButton =
                 KeyboardUtils.createKeyboardButton(AvailableCommands.ABOUT_SHELTER.getDescription());
@@ -40,7 +42,7 @@ public class ShelterInfoCommand extends ExecutableBotCommand {
         KeyboardButton[] safetyButton =
                 KeyboardUtils.createKeyboardButton(AvailableCommands.SAFETY_RULES.getDescription());
         KeyboardButton[] backButton =
-                KeyboardUtils.createKeyboardButton(AvailableCommands.TO_MAIN_MENU.getDescription());
+                KeyboardUtils.createKeyboardButton(CommandDescriptions.TO_MAIN_MENU_DESC);
 
         return KeyboardUtils.createKeyboard(aboutButton, addressButton, safetyButton, backButton);
     }
