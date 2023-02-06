@@ -8,7 +8,6 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import pro.sky.telegrambotshelter.model.User;
 import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
-import pro.sky.telegrambotshelter.model.enums.AvailableCommands;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.UserService;
 import pro.sky.telegrambotshelter.utils.KeyboardUtils;
@@ -21,6 +20,9 @@ import static pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescript
 import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 import static pro.sky.telegrambotshelter.utils.KeyboardUtils.createKeyboard;
 import static pro.sky.telegrambotshelter.utils.KeyboardUtils.createKeyboardButton;
+import static pro.sky.telegrambotshelter.model.enums.AvailableCommands.*;
+import static pro.sky.telegrambotshelter.utils.KeyboardUtils.createKeyboard;
+import static pro.sky.telegrambotshelter.utils.KeyboardUtils.createKeyboardButton;
 
 @Component
 public class StartCommand extends ExecutableBotCommand {
@@ -31,6 +33,12 @@ public class StartCommand extends ExecutableBotCommand {
         super(AvailableCommands.START.getCommand(),
                 AvailableCommands.START.getDescription(),
                 AvailableCommands.START.isTopLevel(),
+                EnumSet.allOf(CurrentMenu.class)
+
+    public StartCommand(TelegramCommandBot bot, UserService userService) {
+        super(START.getCommand(),
+                START.getDescription(),
+                START.isTopLevel(),
                 EnumSet.allOf(CurrentMenu.class)
         );
         this.bot = bot;
