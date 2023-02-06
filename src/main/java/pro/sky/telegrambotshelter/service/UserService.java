@@ -24,10 +24,7 @@ import pro.sky.telegrambotshelter.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 
@@ -44,7 +41,7 @@ public class UserService {
     /**
      * Список волонтеров
      */
-    private final LinkedList<User> volunteerList = new LinkedList<>();
+    private final LinkedHashSet<User> volunteerList = new LinkedHashSet<>();
 
     @PostConstruct
     public void init() {
@@ -57,13 +54,15 @@ public class UserService {
      * @return chatId следующего волонтера
      */
     public Long getNextVolunteer() {
-        User first = volunteerList.pollFirst();
+        Iterator<User> it = volunteerList.iterator();
+        User first = it.next();
+        it.remove();
 
         if (first == null) {
             throw new UserNotFoundException("At least one volunteer must be present!");
         }
 
-        volunteerList.offerLast(first);
+        volunteerList.add(first);
         return first.getChatId();
     }
 
@@ -74,13 +73,9 @@ public class UserService {
     @Async
     @Transactional
     public void updateVolunteerList() {
-        List<User> currentVolunteers = userRepository.findVolunteers();
+        Set<User> currentVolunteers = userRepository.findVolunteers();
         volunteerList.removeIf(v -> !currentVolunteers.contains(v));
-        currentVolunteers.forEach(v -> {
-            if (!volunteerList.contains(v)) {
-                volunteerList.offerLast(v);
-            }
-        });
+        volunteerList.addAll(currentVolunteers);
     }
 
     /**
