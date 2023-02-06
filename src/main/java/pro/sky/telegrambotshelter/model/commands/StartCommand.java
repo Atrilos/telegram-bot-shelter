@@ -16,7 +16,8 @@ import pro.sky.telegrambotshelter.utils.KeyboardUtils;
 import java.util.EnumSet;
 import java.util.List;
 
-import static pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescriptions.*;
+import static pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescriptions.ALT_TO_MAIN_MENU;
+import static pro.sky.telegrambotshelter.configuration.UIstrings.CommandDescriptions.TO_MAIN_MENU_DESC;
 import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 import static pro.sky.telegrambotshelter.utils.KeyboardUtils.createKeyboard;
 import static pro.sky.telegrambotshelter.utils.KeyboardUtils.createKeyboardButton;
@@ -39,11 +40,11 @@ public class StartCommand extends ExecutableBotCommand {
     public static ReplyKeyboardMarkup createReplyKeyboardShelterKnown() {
 
         return createKeyboard(
-                createKeyboardButton(SHELTER_INFO_DESC),
-                createKeyboardButton(ADOPT_DESC),
-                createKeyboardButton(SEND_REPORT_DESC),
+                createKeyboardButton(AvailableCommands.SHELTER_INFO.getDescription()),
+                createKeyboardButton(AvailableCommands.ADOPT.getDescription()),
+                createKeyboardButton(AvailableCommands.REPORT.getDescription()),
                 createKeyboardButton(AvailableCommands.HELP.getCommand()),
-                createKeyboardButton(CALL_STAFF_DESC)
+                createKeyboardButton(AvailableCommands.CALL_STAFF.getDescription())
         );
 
     }

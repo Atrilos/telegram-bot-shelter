@@ -38,7 +38,7 @@ public class StoreContactInfoCommand extends ExecutableBotCommand {
         if (user.getPhoneNumber() != null) {
             message = new SendMessage(user.getChatId(), CONTACT_ALREADY_IN_DB);
         } else {
-            message = new SendMessage(user.getChatId(), CommandDescriptions.STORE_CONTACT_INFO_DESC);
+            message = new SendMessage(user.getChatId(), AvailableCommands.STORE_CONTACT_INFO.getDescription());
             ReplyKeyboardMarkup replyKeyboardMarkup = createReplyKeyboard();
             message.replyMarkup(replyKeyboardMarkup);
         }

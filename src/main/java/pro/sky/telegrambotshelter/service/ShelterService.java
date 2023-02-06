@@ -76,6 +76,7 @@ public class ShelterService {
 
     /**
      * Возвращает Shelter
+     *
      * @param isCatShelter Является ли приютом для кошек
      */
     public Shelter getShelter(boolean isCatShelter) {
