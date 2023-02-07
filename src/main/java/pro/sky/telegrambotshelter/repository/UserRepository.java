@@ -7,15 +7,14 @@ import pro.sky.telegrambotshelter.model.User;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select u from User u where u.chatId = ?1")
     Optional<User> findByChatId(Long chatId);
 
-    @Query("select u from User u where u.isVolunteer = true")
-    Set<User> findVolunteers();
+    @Query("select u from User u where u.isVolunteer = true order by random() limit 1")
+    Optional<User> findRandomVolunteer();
 
     @Query("select u from User u where u.isCatAdopter = true")
     List<User> findByIsCatAdopter();
@@ -30,4 +29,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByIsDogAdopterTrial();
 
     List<User> findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue();
+
+
 }

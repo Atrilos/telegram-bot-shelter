@@ -7,7 +7,6 @@ import com.pengrad.telegrambot.request.ForwardMessage;
 import com.pengrad.telegrambot.request.SendContact;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -40,44 +39,15 @@ public class UserService {
     private final TelegramCommandBot bot;
 
     /**
-     * Список волонтеров
-     */
-    private Set<User> volunteerList;
-
-    @PostConstruct
-    public void init() {
-        volunteerList = new LinkedHashSet<>();
-        updateVolunteerList();
-    }
-
-    /**
-     * Метод, возвращающий следующего по порядку волонтера из списка волонтеров
+     * Метод, возвращающий следующего случайного волонтера из списка волонтеров
      *
      * @return chatId следующего волонтера
      */
     public Long getNextVolunteer() {
-        Iterator<User> it = volunteerList.iterator();
-        User first = it.next();
-        it.remove();
-
-        if (first == null) {
-            throw new UserNotFoundException("At least one volunteer must be present!");
-        }
-
-        volunteerList.add(first);
-        return first.getChatId();
-    }
-
-    /**
-     * Event loop обновляющий список волонтеров
-     */
-    @Scheduled(cron = "0 */1 * * * *")// every minute
-    @Async
-    @Transactional
-    public void updateVolunteerList() {
-        Set<User> currentVolunteers = userRepository.findVolunteers();
-        volunteerList.removeIf(v -> !currentVolunteers.contains(v));
-        volunteerList.addAll(currentVolunteers);
+        return userRepository
+                .findRandomVolunteer()
+                .orElseThrow(() -> new UserNotFoundException("At least one volunteer must be present!"))
+                .getChatId();
     }
 
     /**
