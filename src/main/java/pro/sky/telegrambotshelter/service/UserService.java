@@ -7,13 +7,13 @@ import com.pengrad.telegrambot.request.ForwardMessage;
 import com.pengrad.telegrambot.request.SendContact;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pro.sky.telegrambotshelter.exception.AdoptionDayNullException;
 import pro.sky.telegrambotshelter.exception.PrimaryKeyNotNullException;
 import pro.sky.telegrambotshelter.exception.UserNotFoundException;
 import pro.sky.telegrambotshelter.model.User;
@@ -24,10 +24,7 @@ import pro.sky.telegrambotshelter.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 
@@ -42,45 +39,15 @@ public class UserService {
     private final TelegramCommandBot bot;
 
     /**
-     * Список волонтеров
-     */
-    private final LinkedList<User> volunteerList = new LinkedList<>();
-
-    @PostConstruct
-    public void init() {
-        updateVolunteerList();
-    }
-
-    /**
-     * Метод, возвращающий следующего по порядку волонтера из списка волонтеров
+     * Метод, возвращающий следующего случайного волонтера из списка волонтеров
      *
      * @return chatId следующего волонтера
      */
     public Long getNextVolunteer() {
-        User first = volunteerList.pollFirst();
-
-        if (first == null) {
-            throw new UserNotFoundException("At least one volunteer must be present!");
-        }
-
-        volunteerList.offerLast(first);
-        return first.getChatId();
-    }
-
-    /**
-     * Event loop обновляющий список волонтеров
-     */
-    @Scheduled(cron = "0 */1 * * * *")// every minute
-    @Async
-    @Transactional
-    public void updateVolunteerList() {
-        List<User> currentVolunteers = userRepository.findVolunteers();
-        volunteerList.removeIf(v -> !currentVolunteers.contains(v));
-        currentVolunteers.forEach(v -> {
-            if (!volunteerList.contains(v)) {
-                volunteerList.offerLast(v);
-            }
-        });
+        return userRepository
+                .findRandomVolunteer()
+                .orElseThrow(() -> new UserNotFoundException("At least one volunteer must be present!"))
+                .getChatId();
     }
 
     /**
@@ -96,14 +63,25 @@ public class UserService {
         Long availableVolunteerId = getNextVolunteer();
         long today = LocalDateTime.now().getLong(ChronoField.EPOCH_DAY);
         for (User user : userRepository.findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue()) {
-            if (today - user.getLastReportDay().getLong(ChronoField.EPOCH_DAY) > 1 ||
-                today - user.getLastPhotoReportDay().getLong(ChronoField.EPOCH_DAY) > 1) {
+            Long lastReportDay = user.getLastReportDay() == null ?
+                    null : user.getLastReportDay().getLong(ChronoField.EPOCH_DAY);
+            Long lastPhotoReportDay = user.getLastPhotoReportDay() == null ?
+                    null : user.getLastPhotoReportDay().getLong(ChronoField.EPOCH_DAY);
+            Long adoptionDay = user.getAdoptionDay() == null ?
+                    null : user.getAdoptionDay().getLong(ChronoField.EPOCH_DAY);
+
+            if (adoptionDay == null) {
+                throw new AdoptionDayNullException("Adoption day can't be null for %s if trial-flag set to true"
+                        .formatted(user));
+            }
+
+            if (today - adoptionDay >= 30) {
+                bot.execute(new SendMessage(availableVolunteerId, TRIAL_PERIOD_OVER));
+                bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+            } else if (lastReportDay == null || lastPhotoReportDay == null ||
+                today - lastReportDay > 1 || today - lastPhotoReportDay > 1) {
                 bot.execute(new SendMessage(user.getChatId(), SHOULD_SEND_REPORT));
                 bot.execute(new SendMessage(availableVolunteerId, MISSING_REPORT));
-                bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
-            }
-            if (today - user.getAdoptionDay().getLong(ChronoField.EPOCH_DAY) >= 30) {
-                bot.execute(new SendMessage(availableVolunteerId, TRIAL_PERIOD_OVER));
                 bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
             }
         }

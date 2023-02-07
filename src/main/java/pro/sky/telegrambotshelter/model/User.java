@@ -91,18 +91,21 @@ public class User {
      * Номер телефона пользователя. Обязательное поле при передаче пользователя в качестве контакта волонтеру.
      */
     @Column(name = "phone_number", length = 20)
+    @With
     private String phoneNumber;
 
     /**
      * День последнего текстового отчета пользователя.
      */
     @Column(name = "last_report_day")
+    @With
     private LocalDateTime lastReportDay;
 
     /**
      * День последнего фото отчета пользователя.
      */
     @Column(name = "last_photo_report_day")
+    @With
     private LocalDateTime lastPhotoReportDay;
 
     /**
