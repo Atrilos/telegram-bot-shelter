@@ -161,12 +161,12 @@ class UserServiceTest {
         Update update = BotUtils.parseUpdate("{update_id:1, message: {message_id:%d, contact:{user_id: %s, first_name: %s, phone_number: %s}}}"
                 .formatted(USER_VOL_C.getChatId(), USER_VOL_C.getId(), USER_VOL_C.getFirstName(), 1001));
         Contact contact = update.message().contact();
-        User testUser = USER_VOL_C.withPhoneNumber(null);
+        User testUser = USER_VOL_C.toBuilder().phoneNumber(null).build();
 
         when(userRepository.findByChatId(any())).thenReturn(Optional.of(testUser));
 
         assertThatNoException().isThrownBy(() -> out.registerContact(contact));
-        verify(userRepository).saveAndFlush(testUser.withPhoneNumber("1001"));
+        verify(userRepository).saveAndFlush(testUser.toBuilder().phoneNumber("1001").build());
     }
 
     @Test
@@ -202,7 +202,7 @@ class UserServiceTest {
                 new Condition<>(m -> m.getClass().equals(SendContact.class), "1 SendContact invocation");
         Condition<BaseRequest<?,?>> conditionPhoto =
                 new Condition<>(m -> m.getClass().equals(SendPhoto.class), "1 SendPhoto invocation");
-        User testUser = USER_VOL_C.withLastPhotoReportDay(null);
+        User testUser = USER_VOL_C.toBuilder().lastPhotoReportDay(null).build();
 
         when(userRepository.findRandomVolunteer()).thenReturn(Optional.of(USER_VOL_A));
 
@@ -230,7 +230,7 @@ class UserServiceTest {
                 new Condition<>(m -> m.getClass().equals(SendContact.class), "1 SendContact invocation");
         Condition<BaseRequest<?,?>> conditionForward =
                 new Condition<>(m -> m.getClass().equals(ForwardMessage.class), "1 ForwardMessage invocation");
-        User testUser = USER_VOL_C.withLastReportDay(null);
+        User testUser = USER_VOL_C.toBuilder().lastReportDay(null).build();
 
         when(userRepository.findRandomVolunteer()).thenReturn(Optional.of(USER_VOL_A));
 
