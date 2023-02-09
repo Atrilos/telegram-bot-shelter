@@ -1,6 +1,7 @@
 package pro.sky.telegrambotshelter.service.testConstants;
 
 import pro.sky.telegrambotshelter.model.User;
+import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,7 +11,7 @@ public class UserServiceTestConstants {
     // Значение id не важно, но добавлено на случай изменения имплементации
     public static final User USER_VOL_A = User.builder().id(1L).firstName("A").chatId(1L).isVolunteer(true).phoneNumber("123").build();
     public static final User USER_VOL_B = User.builder().id(2L).firstName("B").chatId(2L).isVolunteer(true).phoneNumber("124").build();
-    public static final User USER_VOL_C = User.builder().id(3L).firstName("C").chatId(3L).isVolunteer(true).phoneNumber("125").build();
+    public static final User USER_VOL_C = User.builder().id(3L).firstName("C").chatId(3L).isVolunteer(true).phoneNumber("125").currentMenu(CurrentMenu.CALL_STAFF).build();
     public static final User USER_VOL_D = User.builder().id(4L).firstName("D").chatId(4L).isVolunteer(true).phoneNumber("126").build();
     public static final User USER_DOG_ADOPTER_REPORT_SENT = User.builder().id(5L).firstName("A").chatId(5L).isVolunteer(false).phoneNumber("127")
             .isDogAdopterTrial(true).adoptionDay(LocalDateTime.of(LocalDate.ofEpochDay(38), LocalTime.MIN))
