@@ -44,4 +44,40 @@ class UserRepositoryTest {
         entityManager.persist(a);
         assertThat(out.findByChatId(1L)).isEqualTo(Optional.of(a)); //equality by natural id, so no need to check id
     }
+
+    @Test
+    public void findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue() {
+        User a = User.builder().chatId(1L).firstName("A").isDogAdopterTrial(true).build();
+        User b = User.builder().chatId(2L).firstName("B").isCatAdopterTrial(true).build();
+        User c = User.builder().chatId(3L).firstName("C").build();
+
+        entityManager.persist(a);
+        assertThat(out.findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue())
+                .hasSize(1)
+                .contains(a);
+
+        entityManager.persist(b);
+        assertThat(out.findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue())
+                .hasSize(2)
+                .contains(a, b);
+
+        entityManager.persist(c);
+        assertThat(out.findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue())
+                .doesNotContain(c);
+    }
+
+    @Test
+    public void findRandomVolunteer() {
+        User a = User.builder().chatId(1L).firstName("A").isVolunteer(true).build();
+        User b = User.builder().chatId(2L).firstName("B").isVolunteer(true).build();
+        User c = User.builder().chatId(3L).firstName("C").isVolunteer(false).build();
+        entityManager.persist(a);
+        entityManager.persist(b);
+        entityManager.persist(c);
+
+        Optional<User> randomVolunteer = out.findRandomVolunteer();
+
+        assertThat(randomVolunteer.isPresent()).isTrue();
+        assertThat(randomVolunteer.get().getIsVolunteer()).isTrue();
+    }
 }

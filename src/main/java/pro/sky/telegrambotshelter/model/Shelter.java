@@ -37,46 +37,53 @@ public class Shelter {
      * о приюте
      */
     @Column(name = "about", nullable = false)
-    private String about;
+    @Builder.Default
+    private String about = "";
     /**
      * Рабочие часы приюта
      */
     @Column(name = "open_hours", nullable = false)
-    private String openHours;
+    @Builder.Default
+    private String openHours = "";
 
     /**
      * Ссылка на карту с местоположением приюта
      */
     @Column(name = "map_url", nullable = false)
-    private String mapUrl;
+    @Builder.Default
+    private String mapUrl = "";
 
     /**
      * Инструкции по правилам безопасности внутри приюта
      */
     @Lob
     @Column(name = "safety_instructions", nullable = false)
-    private String safetyInstructions;
+    @Builder.Default
+    private String safetyInstructions = "";
 
     /**
      * Правила знакомства с животными
      */
     @Lob
     @Column(name = "meeting_rules", nullable = false)
-    private String meetingRules;
+    @Builder.Default
+    private String meetingRules = "";
 
     /**
      * Список документов, чтобы взять животное из приюта
      */
     @Lob
     @Column(name = "papers", nullable = false)
-    private String papers;
+    @Builder.Default
+    private String papers = "";
 
     /**
      * Рекомендации по транспортировке животного
      */
     @Lob
     @Column(name = "transport", nullable = false)
-    private String transport;
+    @Builder.Default
+    private String transport = "";
 
     /**
      * Рекомендации по обустройству дома для щенка
@@ -111,7 +118,8 @@ public class Shelter {
      */
     @Lob
     @Column(name = "communication", nullable = false)
-    private String communication;
+    @Builder.Default
+    private String communication = "";
 
     /**
      * Рекомендации по проверенным кинологам для дальнейшего обращения к ним
@@ -125,7 +133,8 @@ public class Shelter {
      */
     @Lob
     @Column(name = "refusal_cause", nullable = false)
-    private String refusalCause;
+    @Builder.Default
+    private String refusalCause = "";
 
     @OneToMany(mappedBy = "shelter")
     private Set<Pet> pets = new HashSet<>();
