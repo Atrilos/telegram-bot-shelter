@@ -15,7 +15,6 @@ spring:
     hibernate:
       ddl-auto: validate
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
     open-in-view: false
   jackson:
     serialization:
@@ -25,7 +24,9 @@ spring:
 logging:
   level:
     org:
-      hibernate: INFO
+      hibernate:
+        SQL: debug
+
 # Constants
 telegram:
   bot:

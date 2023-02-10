@@ -12,6 +12,7 @@ import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.service.UserService;
 import pro.sky.telegrambotshelter.utils.KeyboardUtils;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 import java.util.EnumSet;
@@ -25,8 +26,9 @@ public class ReportCommand extends ExecutableBotCommand {
 
     private final UserService userService;
     private final TelegramCommandBot bot;
+    private final Clock clock;
 
-    public ReportCommand(UserService userService, TelegramCommandBot bot) {
+    public ReportCommand(UserService userService, TelegramCommandBot bot, Clock clock) {
         super(AvailableCommands.REPORT.getCommand(),
                 AvailableCommands.REPORT.getDescription(),
                 AvailableCommands.REPORT.isTopLevel(),
@@ -34,6 +36,7 @@ public class ReportCommand extends ExecutableBotCommand {
         );
         this.userService = userService;
         this.bot = bot;
+        this.clock = clock;
     }
 
     static ReplyKeyboardMarkup createReplyKeyboard() {
@@ -48,7 +51,7 @@ public class ReportCommand extends ExecutableBotCommand {
         if (lastReportDay == null) {
             return false;
         }
-        return lastReportDay.getLong(ChronoField.EPOCH_DAY) == LocalDateTime.now().getLong(ChronoField.EPOCH_DAY);
+        return lastReportDay.getLong(ChronoField.EPOCH_DAY) == LocalDateTime.now(clock).getLong(ChronoField.EPOCH_DAY);
     }
 
     public boolean adopterSentPhotoToday(User user) {
@@ -56,7 +59,7 @@ public class ReportCommand extends ExecutableBotCommand {
         if (lastPhotoReportDay == null) {
             return false;
         }
-        return lastPhotoReportDay.getLong(ChronoField.EPOCH_DAY) == LocalDateTime.now().getLong(ChronoField.EPOCH_DAY);
+        return lastPhotoReportDay.getLong(ChronoField.EPOCH_DAY) == LocalDateTime.now(clock).getLong(ChronoField.EPOCH_DAY);
     }
 
     @Override

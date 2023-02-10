@@ -25,6 +25,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByIsDogAdopterTrialTrue();
 
     List<User> findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue();
-
-
 }
