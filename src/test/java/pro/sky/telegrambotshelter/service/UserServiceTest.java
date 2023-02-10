@@ -5,12 +5,12 @@ import com.pengrad.telegrambot.model.Contact;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.*;
 import org.assertj.core.api.Condition;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pro.sky.telegrambotshelter.exception.AdoptionDayNullException;
 import pro.sky.telegrambotshelter.exception.UserNotFoundException;
@@ -35,10 +35,18 @@ class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private TelegramCommandBot bot;
-    @Spy
+    @Mock
     private Clock clock;
     @InjectMocks
     private UserService out;
+
+    private Clock epoch40;
+
+    @BeforeEach
+    void setUp() {
+        Instant instant = LocalDateTime.of(LocalDate.ofEpochDay(40L), LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant();
+        epoch40 = Clock.fixed(instant, ZoneId.systemDefault());
+    }
 
     @Test
     public void getNextVolunteerPositive() {
@@ -72,13 +80,9 @@ class UserServiceTest {
                 .thenReturn(List.of(user));
     }
 
-    private Clock setupClockStubbing() {
-        Instant instant = LocalDateTime.of(LocalDate.ofEpochDay(40L), LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant();
-        Clock epoch40 = Clock.fixed(instant, ZoneId.systemDefault());
+    private void setupClockStubbing() {
         when(clock.instant()).thenReturn(epoch40.instant());
         when(clock.getZone()).thenReturn(epoch40.getZone());
-
-        return epoch40;
     }
 
     @Test
@@ -203,7 +207,7 @@ class UserServiceTest {
         User testUser = USER_VOL_C.toBuilder().lastPhotoReportDay(null).build();
 
         when(userRepository.findRandomVolunteer()).thenReturn(Optional.of(USER_VOL_A));
-        Clock clockStubbing = setupClockStubbing();
+        setupClockStubbing();
 
         out.processReport(update, testUser);
 
@@ -213,7 +217,7 @@ class UserServiceTest {
         assertThat(captorBaseRequest.getAllValues()).areExactly(1, conditionContact);
         assertThat(captorBaseRequest.getAllValues()).areExactly(1, conditionPhoto);
         assertThat(captorUser.getAllValues()).hasSize(1);
-        assertThat(captorUser.getAllValues().get(0).getLastPhotoReportDay()).isEqualTo(LocalDateTime.now(clockStubbing));
+        assertThat(captorUser.getAllValues().get(0).getLastPhotoReportDay()).isEqualTo(LocalDateTime.now(epoch40));
     }
 
     @Test
@@ -232,7 +236,7 @@ class UserServiceTest {
         User testUser = USER_VOL_C.toBuilder().lastReportDay(null).build();
 
         when(userRepository.findRandomVolunteer()).thenReturn(Optional.of(USER_VOL_A));
-        Clock clockStubbing = setupClockStubbing();
+        setupClockStubbing();
 
         out.processReport(update, testUser);
 
@@ -242,6 +246,6 @@ class UserServiceTest {
         assertThat(captorBaseRequest.getAllValues()).areExactly(1, conditionContact);
         assertThat(captorBaseRequest.getAllValues()).areExactly(1, conditionForward);
         assertThat(captorUser.getAllValues()).hasSize(1);
-        assertThat(captorUser.getAllValues().get(0).getLastReportDay()).isEqualTo(LocalDateTime.now(clockStubbing));
+        assertThat(captorUser.getAllValues().get(0).getLastReportDay()).isEqualTo(LocalDateTime.now(epoch40));
     }
 }
