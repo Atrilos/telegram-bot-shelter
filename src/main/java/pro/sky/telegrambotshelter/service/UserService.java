@@ -22,6 +22,7 @@ import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
 import pro.sky.telegrambotshelter.model.enums.ShelterType;
 import pro.sky.telegrambotshelter.repository.UserRepository;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 import java.util.*;
@@ -37,6 +38,7 @@ import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 public class UserService {
     private final UserRepository userRepository;
     private final TelegramCommandBot bot;
+    private final Clock clock;
 
     /**
      * Метод, возвращающий следующего случайного волонтера из списка волонтеров
@@ -61,7 +63,7 @@ public class UserService {
             return;
 
         Long availableVolunteerId = getNextVolunteer();
-        long today = LocalDateTime.now().getLong(ChronoField.EPOCH_DAY);
+        long today = LocalDateTime.now(clock).getLong(ChronoField.EPOCH_DAY);
         for (User user : userRepository.findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue()) {
             Long lastReportDay = user.getLastReportDay() == null ?
                     null : user.getLastReportDay().getLong(ChronoField.EPOCH_DAY);
@@ -218,7 +220,7 @@ public class UserService {
             bot.execute(new SendMessage(availableVolunteerId, USER_REPORT));
             bot.execute(new ForwardMessage(availableVolunteerId, fromChatId, messageId));
             bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
-            user.setLastReportDay(LocalDateTime.now());
+            user.setLastReportDay(LocalDateTime.now(clock));
         } else {
             PhotoSize[] photoSizes = update.message().photo();
             if (photoSizes != null && photoSizes.length > 0) {
@@ -226,7 +228,7 @@ public class UserService {
                 bot.execute(new SendMessage(availableVolunteerId, USER_PHOTO_REPORT));
                 bot.execute(new SendPhoto(availableVolunteerId, biggestPhoto.fileId()));
                 bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
-                user.setLastPhotoReportDay(LocalDateTime.now());
+                user.setLastPhotoReportDay(LocalDateTime.now(clock));
             }
         }
         updateEntity(user);
