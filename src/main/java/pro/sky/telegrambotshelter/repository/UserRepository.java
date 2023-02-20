@@ -16,13 +16,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select u from User u where u.isVolunteer = true order by random() limit 1")
     Optional<User> findRandomVolunteer();
 
-    List<User> findByIsCatAdopterTrue();
-
-    List<User> findByIsCatAdopterTrialTrue();
-
-    List<User> findByIsDogAdopterTrue();
-
-    List<User> findByIsDogAdopterTrialTrue();
-
     List<User> findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue();
 }
