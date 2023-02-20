@@ -1,22 +1,33 @@
 package pro.sky.telegrambotshelter.service;
 
 import com.pengrad.telegrambot.model.Contact;
+import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.model.Update;
-import jakarta.annotation.PostConstruct;
+import com.pengrad.telegrambot.request.ForwardMessage;
+import com.pengrad.telegrambot.request.SendContact;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pro.sky.telegrambotshelter.exception.AdoptionDayNullException;
 import pro.sky.telegrambotshelter.exception.PrimaryKeyNotNullException;
 import pro.sky.telegrambotshelter.exception.UserNotFoundException;
 import pro.sky.telegrambotshelter.model.User;
+import pro.sky.telegrambotshelter.model.bot.TelegramCommandBot;
 import pro.sky.telegrambotshelter.model.enums.CurrentMenu;
+import pro.sky.telegrambotshelter.model.enums.ShelterType;
 import pro.sky.telegrambotshelter.repository.UserRepository;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
+import java.util.*;
+
+import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 
 /**
  * Сервис для обработки взаимодействий с пользователями
@@ -26,46 +37,57 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    /**
-     * Список волонтеров
-     */
-    private final LinkedList<User> volunteerList = new LinkedList<>();
-
-    @PostConstruct
-    public void init() {
-        updateVolunteerList();
-    }
+    private final TelegramCommandBot bot;
+    private final Clock clock;
 
     /**
-     * Метод, возвращающий следующего по порядку волонтера из списка волонтеров
+     * Метод, возвращающий следующего случайного волонтера из списка волонтеров
      *
      * @return chatId следующего волонтера
      */
     public Long getNextVolunteer() {
-        User first = volunteerList.pollFirst();
-
-        if (first == null) {
-            throw new UserNotFoundException("At least one volunteer must be present!");
-        }
-
-        volunteerList.offerLast(first);
-        return first.getChatId();
+        return userRepository
+                .findRandomVolunteer()
+                .orElseThrow(() -> new UserNotFoundException("At least one volunteer must be present!"))
+                .getChatId();
     }
 
     /**
-     * Event loop обновляющий список волонтеров
+     * Проверка отчетов о питомцах
      */
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "0 0 0 * * *") // every day
     @Async
     @Transactional
-    public void updateVolunteerList() {
-        List<User> currentVolunteers = userRepository.findVolunteers();
-        volunteerList.retainAll(currentVolunteers);
-        for (User user : currentVolunteers)
-            if (!volunteerList.contains(user))
-                volunteerList.offerLast(user);
-    }
+    public void checkAdoptersReports() {
+        if (bot.isTestMode())
+            return;
 
+        Long availableVolunteerId = getNextVolunteer();
+        long today = LocalDateTime.now(clock).getLong(ChronoField.EPOCH_DAY);
+        for (User user : userRepository.findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue()) {
+            Long lastReportDay = user.getLastReportDay() == null ?
+                    null : user.getLastReportDay().getLong(ChronoField.EPOCH_DAY);
+            Long lastPhotoReportDay = user.getLastPhotoReportDay() == null ?
+                    null : user.getLastPhotoReportDay().getLong(ChronoField.EPOCH_DAY);
+            Long adoptionDay = user.getAdoptionDay() == null ?
+                    null : user.getAdoptionDay().getLong(ChronoField.EPOCH_DAY);
+
+            if (adoptionDay == null) {
+                throw new AdoptionDayNullException("Adoption day can't be null for %s if trial-flag set to true"
+                        .formatted(user));
+            }
+
+            if (today - adoptionDay >= 30) {
+                bot.execute(new SendMessage(availableVolunteerId, TRIAL_PERIOD_OVER));
+                bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+            } else if (lastReportDay == null || lastPhotoReportDay == null ||
+                today - lastReportDay > 1 || today - lastPhotoReportDay > 1) {
+                bot.execute(new SendMessage(user.getChatId(), SHOULD_SEND_REPORT));
+                bot.execute(new SendMessage(availableVolunteerId, MISSING_REPORT));
+                bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+            }
+        }
+    }
 
     /**
      * Метод, регистрирующий пользователя, если запись о нем отсутствует в БД
@@ -108,9 +130,6 @@ public class UserService {
         User user = User.builder()
                 .firstName(firstName)
                 .chatId(chatId)
-                .isAdmin(false)
-                .isVolunteer(false)
-                .currentMenu(CurrentMenu.MAIN)
                 .build();
         saveEntity(user);
     }
@@ -174,4 +193,46 @@ public class UserService {
         user.setCurrentMenu(newMenu);
         updateEntity(user);
     }
+
+    /**
+     * Изменение текущего типа приюта
+     *
+     * @param user        текущий пользователь
+     * @param shelterType новое значение типа приюта
+     */
+    public void changeCurrentShelterType(User user, ShelterType shelterType) {
+        user.setCurrentShelter(shelterType);
+        updateEntity(user);
+    }
+
+    /**
+     * Обработка отчета пользователя о питомце
+     *
+     * @param update update от пользователя
+     * @param user   пользователь, отсылающий отчет
+     */
+    public void processReport(Update update, User user) {
+        String text = update.message().text();
+        Long availableVolunteerId = getNextVolunteer();
+        if (text != null) {
+            Long fromChatId = update.message().from().id();
+            Integer messageId = update.message().messageId();
+            bot.execute(new SendMessage(availableVolunteerId, USER_REPORT));
+            bot.execute(new ForwardMessage(availableVolunteerId, fromChatId, messageId));
+            bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+            user.setLastReportDay(LocalDateTime.now(clock));
+        } else {
+            PhotoSize[] photoSizes = update.message().photo();
+            if (photoSizes != null && photoSizes.length > 0) {
+                PhotoSize biggestPhoto = Arrays.stream(photoSizes).max(Comparator.comparing(PhotoSize::fileSize)).get();
+                bot.execute(new SendMessage(availableVolunteerId, USER_PHOTO_REPORT));
+                bot.execute(new SendPhoto(availableVolunteerId, biggestPhoto.fileId()));
+                bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
+                user.setLastPhotoReportDay(LocalDateTime.now(clock));
+            }
+        }
+        updateEntity(user);
+    }
+
+
 }

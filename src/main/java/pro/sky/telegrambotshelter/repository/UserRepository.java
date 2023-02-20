@@ -10,10 +10,19 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    @Query("select u from User u where u.chatId = ?1")
+
     Optional<User> findByChatId(Long chatId);
 
-    @Query("select u from User u where u.isVolunteer = true")
-    List<User> findVolunteers();
+    @Query("select u from User u where u.isVolunteer = true order by random() limit 1")
+    Optional<User> findRandomVolunteer();
 
+    List<User> findByIsCatAdopterTrue();
+
+    List<User> findByIsCatAdopterTrialTrue();
+
+    List<User> findByIsDogAdopterTrue();
+
+    List<User> findByIsDogAdopterTrialTrue();
+
+    List<User> findByIsDogAdopterTrialTrueOrIsCatAdopterTrialTrue();
 }

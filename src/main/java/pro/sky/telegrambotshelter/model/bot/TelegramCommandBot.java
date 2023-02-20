@@ -22,6 +22,8 @@ public class TelegramCommandBot extends TelegramBot {
      */
     private final Set<BotCommand> commandRegistry = new HashSet<>();
 
+    private final boolean testMode = true;
+
     public TelegramCommandBot(String botToken) {
         super(botToken);
     }
