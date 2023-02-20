@@ -2,6 +2,8 @@ package pro.sky.telegrambotshelter.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.exception.PrimaryKeyNotNullException;
 import pro.sky.telegrambotshelter.exception.ShelterNotFoundException;
@@ -79,6 +81,7 @@ public class ShelterService {
      *
      * @param isCatShelter Является ли приютом для кошек
      */
+    @Cacheable(value = "shelter_cache", key = "#isCatShelter")
     public Shelter getShelter(boolean isCatShelter) {
         List<Shelter> shelters = findByIsCatShelter(isCatShelter);
         if (shelters.size() == 0)
@@ -91,11 +94,12 @@ public class ShelterService {
         return shelterRepository.saveAndFlush(shelter);
     }
 
-    private void saveEntity(Shelter shelter) {
+    @CachePut(value = "shelter_cache", key = "#shelter.isCatShelter")
+    public Shelter saveEntity(Shelter shelter) {
         if (shelter.getId() != null) {
             throw new PrimaryKeyNotNullException("%s primary key not null when saving new entity".formatted(shelter));
         }
-        shelterRepository.save(shelter);
+        return shelterRepository.save(shelter);
     }
 
     private List<Shelter> findByIsCatShelter(boolean isCatShelter) {
