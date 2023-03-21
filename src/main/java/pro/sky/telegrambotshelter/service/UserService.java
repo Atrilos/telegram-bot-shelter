@@ -8,6 +8,8 @@ import com.pengrad.telegrambot.request.SendContact;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,7 +27,8 @@ import pro.sky.telegrambotshelter.repository.UserRepository;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import static pro.sky.telegrambotshelter.configuration.UIstrings.UIstrings.*;
 
@@ -81,7 +84,7 @@ public class UserService {
                 bot.execute(new SendMessage(availableVolunteerId, TRIAL_PERIOD_OVER));
                 bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
             } else if (lastReportDay == null || lastPhotoReportDay == null ||
-                today - lastReportDay > 1 || today - lastPhotoReportDay > 1) {
+                       today - lastReportDay > 1 || today - lastPhotoReportDay > 1) {
                 bot.execute(new SendMessage(user.getChatId(), SHOULD_SEND_REPORT));
                 bot.execute(new SendMessage(availableVolunteerId, MISSING_REPORT));
                 bot.execute(new SendContact(availableVolunteerId, user.getPhoneNumber(), user.getFirstName()));
@@ -110,6 +113,7 @@ public class UserService {
      * @param contact {@link com.pengrad.telegrambot.model.Contact контактная информация}
      * @return обновленная сущность из БД
      */
+    @CachePut(value = "user_cache", key = "#contact.userId")
     public User registerContact(Contact contact) {
         User user = userRepository
                 .findByChatId(contact.userId())
@@ -126,7 +130,8 @@ public class UserService {
      * @param firstName имя пользователя
      * @param chatId    уникальный идентификатор чата
      */
-    private void registerNewUser(String firstName, Long chatId) {
+    @CachePut(value = "user_cache", key = "#chatId")
+    public void registerNewUser(String firstName, Long chatId) {
         User user = User.builder()
                 .firstName(firstName)
                 .chatId(chatId)
@@ -175,6 +180,7 @@ public class UserService {
      * @return полученная сущность из БД
      * @throws UserNotFoundException пользователь не найден в БД
      */
+    @Cacheable(value = "user_cache", key = "#chatId", unless = "#result == null")
     public User getUser(Long chatId) {
         return userRepository
                 .findByChatId(chatId)
@@ -189,9 +195,10 @@ public class UserService {
      * @param user    текущий пользователь
      * @param newMenu новое значение текущего меню
      */
-    public void changeCurrentMenu(User user, CurrentMenu newMenu) {
+    @CachePut(value = "user_cache", key = "#user.chatId")
+    public User changeCurrentMenu(User user, CurrentMenu newMenu) {
         user.setCurrentMenu(newMenu);
-        updateEntity(user);
+        return updateEntity(user);
     }
 
     /**
@@ -200,9 +207,10 @@ public class UserService {
      * @param user        текущий пользователь
      * @param shelterType новое значение типа приюта
      */
-    public void changeCurrentShelterType(User user, ShelterType shelterType) {
+    @CachePut(value = "user_cache", key = "#user.chatId")
+    public User changeCurrentShelterType(User user, ShelterType shelterType) {
         user.setCurrentShelter(shelterType);
-        updateEntity(user);
+        return updateEntity(user);
     }
 
     /**
@@ -211,7 +219,8 @@ public class UserService {
      * @param update update от пользователя
      * @param user   пользователь, отсылающий отчет
      */
-    public void processReport(Update update, User user) {
+    @CachePut(value = "user_cache", key = "#user.chatId")
+    public User processReport(Update update, User user) {
         String text = update.message().text();
         Long availableVolunteerId = getNextVolunteer();
         if (text != null) {
@@ -231,7 +240,7 @@ public class UserService {
                 user.setLastPhotoReportDay(LocalDateTime.now(clock));
             }
         }
-        updateEntity(user);
+        return updateEntity(user);
     }
 
 
